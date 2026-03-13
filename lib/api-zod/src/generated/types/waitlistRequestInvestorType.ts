@@ -5,9 +5,6 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-export interface HealthStatus {
-  status: string;
-}
 
 export type WaitlistRequestInvestorType =
   (typeof WaitlistRequestInvestorType)[keyof typeof WaitlistRequestInvestorType];
@@ -19,26 +16,3 @@ export const WaitlistRequestInvestorType = {
   agent_operator: "agent_operator",
   just_exploring: "just_exploring",
 } as const;
-
-export interface WaitlistRequest {
-  /** @maxLength 100 */
-  firstName?: string;
-  /** @maxLength 255 */
-  email: string;
-  investorType?: WaitlistRequestInvestorType;
-}
-
-export interface WaitlistResponse {
-  success: boolean;
-  message: string;
-  position: number;
-}
-
-export interface ErrorResponse {
-  error: string;
-  message: string;
-}
-
-export type ExportWaitlistParams = {
-  adminKey: string;
-};

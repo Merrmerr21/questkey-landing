@@ -6,4 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./errorResponse";
+export * from "./exportWaitlistParams";
 export * from "./healthStatus";
+export * from "./waitlistRequest";
+export * from "./waitlistRequestInvestorType";
+export * from "./waitlistResponse";

@@ -1,0 +1,362 @@
+You are an elite startup product engineer and brand-focused front-end developer.## Brand positioning
+This is NOT a generic AI assistant.
+This is a smart decision platform for rental investors.
+ 
+The messaging should emphasize:
+- smarter deal decisions
+- strategy comparison
+- underwriting clarity
+- knowing what to buy before making an offer
+- optionality between Airbnb, MTR, and LTR
+- risk-aware investing
+ 
+The tone should be:
+- intelligent
+- calm
+- premium
+- analytical
+- useful
+- trustworthy
+ 
+Avoid hype-y “AI bro” language.
+Avoid buzzword soup.
+Avoid cheesy real estate clichés.
+ 
+---
+ 
+## Website structure
+Build the homepage with the following sections:
+ 
+### 1. Hero section
+Include:
+- strong headline
+- strong subheadline
+- email capture form
+- CTA button: “Get Early Access”
+- subtle trust text below form
+ 
+Suggested hero messaging:
+Headline:
+**Underwrite smarter rental deals**
+Subheadline:
+**Compare Airbnb, mid-term, and long-term strategies on any property — before you buy.**
+ 
+Below the form, add small text like:
+“Join the waitlist for beta access, founding member pricing, and weekly deal breakdowns.”
+ 
+Also include a beautiful right-side visual or dashboard mockup that looks like:
+- side-by-side STR / MTR / LTR comparison
+- modern cards / charts / metrics
+- buy / maybe / pass signal
+- premium startup UI
+ 
+---
+ 
+### 2. “Meet your investment team” section
+Create cards for specialist AI agents that feel like real team members.
+ 
+Use these names and roles:
+- **Miles** — Underwriting
+- **Avery** — Acquisitions
+- **Rhea** — Risk
+- **Sloane** — Setup
+- **Kai** — Revenue
+- **Theo** — Portfolio
+ 
+Each card should have:
+- name
+- role
+- one-line description
+- circular avatar placeholder or elegant stylized portrait placeholder
+ 
+Descriptions:
+- Miles — “Runs the numbers and compares strategy paths.”
+- Avery — “Helps identify markets and acquisition fit.”
+- Rhea — “Flags downside risk, regulation, and weak assumptions.”
+- Sloane — “Guides setup, furnishing, and guest-readiness.”
+- Kai — “Optimizes pricing and revenue strategy.”
+- Theo — “Helps you think in portfolios, not one-off deals.”
+ 
+These agents should feel premium and trustworthy, not cartoonish.
+ 
+---
+ 
+### 3. “What YieldKey does” section
+Use 4–6 feature cards.
+ 
+Suggested features:
+- Compare STR / MTR / LTR side by side
+- View cash flow, return, and startup assumptions
+- Surface market and regulation risk
+- Recommend best-fit strategy
+- Show fallback plan if Airbnb underperforms
+- Save and review deals over time
+ 
+Each card should feel visually clean and premium.
+ 
+---
+ 
+### 4. “How it works” section
+3 simple steps:
+1. Enter a property
+2. Compare strategies
+3. Invest with clarity
+ 
+Include short supporting text for each step.
+ 
+---
+ 
+### 5. “Built for” section
+Show audience types:
+- first-time rental investors
+- Airbnb hosts
+- long-term landlords
+- out-of-state buyers
+- house hackers
+- small portfolio investors
+ 
+---
+ 
+### 6. Secondary CTA / waitlist section
+Add another strong CTA near the bottom.
+ 
+Suggested headline:
+**Be first to try YieldKey**
+Subheadline:
+**Join early users shaping the smarter way to analyze rental properties.**
+ 
+Include another working email signup form and CTA button:
+**Get Early Access**
+ 
+---
+ 
+### 7. Footer
+Include:
+- logo / product name
+- short one-line description
+- nav links
+- social placeholders
+- copyright
+ 
+---
+ 
+## Waitlist functionality
+The waitlist form must actually work.
+ 
+### Requirements:
+- Collect:
+  - first name (optional or required — your call if UX is better)
+  - email
+  - optional dropdown: “What best describes you?”
+    - First-time investor
+    - Airbnb host
+    - Long-term landlord
+    - Agent / operator
+    - Just exploring
+ 
+- Validate email properly
+- Prevent duplicate signups
+- Show a polished success state after signup
+- Show friendly inline error states
+- Store submissions in a real backend
+ 
+### Backend preference:
+Use the best simple production-friendly option for Replit.
+If needed, use:
+- Node.js backend
+- SQLite or Supabase
+- Prisma if useful
+- clean API routes
+- environment variables for secrets
+ 
+Choose the stack that is easiest to run reliably inside Replit while still being clean and extensible.
+ 
+Also create:
+- an admin-friendly way to view/export waitlist entries
+- at minimum, a local admin page or an export endpoint
+- if that is too heavy, create a CSV export utility
+ 
+---
+ 
+## Tech stack
+Use a modern, clean stack that works well in Replit.
+ 
+Preferred:
+- Next.js or React
+- Tailwind CSS
+- clean component structure
+- modern animations, but tasteful and subtle
+- Lucide or similarly elegant icon set
+- accessible and responsive UI
+ 
+Important:
+- do not over-engineer
+- do not create unnecessary complexity
+- keep the codebase clean, organized, readable, and easy to extend
+ 
+---
+ 
+## Design direction
+Visual style should feel like:
+- premium SaaS
+- modern fintech
+- serious but exciting
+- dark or light theme is okay, but it must look excellent
+ 
+Use:
+- generous spacing
+- strong typography
+- elegant gradients only if tasteful
+- subtle glassmorphism if it helps
+- crisp cards
+- modern hover states
+- polished forms
+- smooth scroll / subtle motion
+ 
+Avoid:
+- gaudy colors
+- cheesy stock-real-estate vibe
+- overdone neon cyberpunk look
+- clutter
+- too much text jammed together
+ 
+The page should look like a startup someone would trust with real money decisions.
+ 
+---
+ 
+## Conversion optimization
+This landing page should be built to convert.
+ 
+Please include:
+- strong visual hierarchy
+- repeated CTA placement
+- persuasive but concise copy
+- a clear reason to join the waitlist
+- subtle trust-building language
+- friction-free form experience
+ 
+Waitlist incentive text should mention:
+- beta access
+- founding member pricing
+- weekly deal breakdowns
+- ability to shape the product early
+ 
+---
+ 
+## UX requirements
+- fully responsive
+- optimized for mobile
+- clean nav
+- fast load feel
+- smooth scrolling
+- good spacing
+- keyboard accessible
+- accessible contrast
+- attractive empty states / success states
+ 
+---
+ 
+## SEO + metadata
+Add:
+- page title
+- meta description
+- Open Graph tags
+- favicon placeholder
+- clean semantic HTML structure
+ 
+Suggested meta description:
+“YieldKey helps rental investors compare Airbnb, mid-term, and long-term strategies on any property before they buy.”
+ 
+---
+ 
+## Deliverables
+I want you to:
+1. Build the full landing page
+2. Build the working waitlist form
+3. Connect the form to a backend / database
+4. Add polished success and error states
+5. Organize the project cleanly
+6. Include a short README with:
+   - how to run locally
+   - how the waitlist works
+   - where signups are stored
+   - how to export leads
+7. Add clear placeholder spots where I can later swap:
+   - branding
+   - avatars
+   - screenshots
+   - copy
+ 
+---
+ 
+## Important implementation notes
+- Do not leave the waitlist as fake front-end only
+- Do not use lorem ipsum
+- Do not generate weak generic marketing copy
+- Do not make it look like a template
+- Do not overcomplicate the backend if a simpler robust solution works
+- Use clean sample data where helpful
+- Make it easy for me to customize later
+ 
+---
+ 
+## Stretch goals (only if they do not hurt quality)
+If you can do this cleanly, also add:
+- subtle animated metric cards in the hero
+- soft reveal animations on scroll
+- a fake “property analysis preview” component
+- a simple thank-you page after signup
+- basic analytics-ready event hooks for CTA clicks and form submissions
+ 
+---
+ 
+## Final instruction
+Act like you are building the first version of a serious venture-backed startup homepage.
+ 
+Make strong product/design decisions yourself where needed.
+Prioritize quality, polish, and clarity.
+Then explain:
+- what you built
+- why you chose the stack
+- how to run it
+- what I should customize first
+``
+ 
+I want you to build a polished, premium, conversion-focused landing page for a startup called **YieldKey**.
+ 
+## Product concept
+YieldKey is a platform for people who want to invest in rental properties. The key differentiator is that it helps users analyze whether a property should be run as:
+- Airbnb / short-term rental (STR)
+- mid-term rental (MTR)
+- long-term rental (LTR)
+ 
+The core promise is:
+**Analyze any rental property before you buy — and compare Airbnb, mid-term, and long-term strategies in one place.**
+ 
+This should feel like a modern proptech / fintech / AI startup website:
+- premium
+- clean
+- sharp
+- data-driven
+- trust-building
+- slightly futuristic
+- not cheesy
+- not cluttered
+- not template-looking
+ 
+The design should feel high-end, like a real startup that could raise money and attract serious users.
+ 
+---
+ 
+## Goal
+Build a landing page with a **working waitlist signup form** and a structure that is optimized for conversion.
+ 
+The main CTA should be:
+**Get Early Access**
+ 
+The page should be responsive, beautiful on mobile, and production-ready.
+ 
+---
+ 
+One more thing:
+I do NOT want a generic AI-generated landing page. I want something that feels intentional, premium, and strategically positioned. If a design or copy decision feels generic, improve it. If something can be cleaner, cleaner wins. If something can be more premium, do that. Think like a top-tier startup designer and product marketer, not like a code generator.

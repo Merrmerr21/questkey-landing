@@ -14,3 +14,33 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Add an email to the waitlist
+ * @summary Join waitlist
+ */
+export const joinWaitlistBodyFirstNameMax = 100;
+
+export const joinWaitlistBodyEmailMax = 255;
+
+export const JoinWaitlistBody = zod.object({
+  firstName: zod.string().max(joinWaitlistBodyFirstNameMax).optional(),
+  email: zod.string().email().max(joinWaitlistBodyEmailMax),
+  investorType: zod
+    .enum([
+      "first_time_investor",
+      "airbnb_host",
+      "long_term_landlord",
+      "agent_operator",
+      "just_exploring",
+    ])
+    .optional(),
+});
+
+/**
+ * Download all waitlist entries as CSV
+ * @summary Export waitlist as CSV
+ */
+export const ExportWaitlistQueryParams = zod.object({
+  adminKey: zod.coerce.string(),
+});

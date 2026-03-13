@@ -1,0 +1,17 @@
+packages:
+  "framer-motion": "For premium smooth scroll animations and micro-interactions"
+  "react-hook-form": "For robust form state management"
+  "@hookform/resolvers": "For Zod validation integration with react-hook-form"
+  "zod": "For waitlist form validation schema"
+  "lucide-react": "For high quality vector icons"
+  "clsx": "For conditional class names"
+  "tailwind-merge": "For merging tailwind classes safely"
+
+images:
+  - path: "artifacts/yieldkey/public/images/hero-glow.png"
+    description: "A very subtle, abstract, dark mesh gradient background in deep navy and dark slate with a very faint, soft emerald green glow in the corner. Highly professional, minimalist fintech style."
+    aspect_ratio: "16:9"
+
+notes:
+  - Waitlist form uses the existing generated API hooks.
+  - Assuming UI components like Toast are available or can be recreated if needed, but will rely on custom polished UI for the main landing page to ensure the design is top-tier.
