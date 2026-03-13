@@ -6,7 +6,4 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export interface ErrorResponse {
-  error: string;
-  message: string;
-}
+export type AnalysisFindings = { [key: string]: unknown } | null;

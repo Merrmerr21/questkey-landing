@@ -1,8 +1,8 @@
-# YieldKey Workspace
+# YieldKey — Full-Stack Platform
 
-## Overview
+## Product Overview
 
-pnpm workspace monorepo using TypeScript. Full-stack landing page for YieldKey — a rental property investment analysis platform.
+YieldKey is a full-stack rental property investment platform. Users register, add properties, and receive analysis from a team of 15 AI agents spanning every business function.
 
 ## Stack
 
@@ -10,92 +10,133 @@ pnpm workspace monorepo using TypeScript. Full-stack landing page for YieldKey �
 - **Node.js version**: 24
 - **Package manager**: pnpm
 - **TypeScript version**: 5.9
-- **Frontend**: React + Vite + Tailwind CSS (artifacts/yieldkey)
-- **API framework**: Express 5 (artifacts/api-server)
+- **Frontend**: React + Vite + Tailwind CSS (artifacts/yieldkey, served at /)
+- **API framework**: Express 5 (artifacts/api-server, served at /api)
 - **Database**: PostgreSQL + Drizzle ORM
-- **Validation**: Zod (`zod/v4`), `drizzle-zod`
-- **API codegen**: Orval (from OpenAPI spec)
-- **Forms**: react-hook-form + @hookform/resolvers
+- **Auth**: JWT (30-day tokens) + bcryptjs password hashing
+- **Validation**: Zod (server) + react-hook-form (client)
+- **API codegen**: Orval from OpenAPI spec
 - **Animations**: framer-motion
 - **Icons**: lucide-react
 
 ## Structure
 
-```text
-artifacts-monorepo/
-├── artifacts/
-│   ├── yieldkey/               # YieldKey landing page (React + Vite, served at /)
-│   └── api-server/             # Express API server (served at /api)
-├── lib/
-│   ├── api-spec/               # OpenAPI spec + Orval codegen config
-│   ├── api-client-react/       # Generated React Query hooks
-│   ├── api-zod/                # Generated Zod schemas from OpenAPI
-│   └── db/                     # Drizzle ORM schema + DB connection
-│       └── src/schema/
-│           └── waitlist.ts     # Waitlist table schema
-├── pnpm-workspace.yaml
-├── tsconfig.base.json
-├── tsconfig.json
-└── package.json
+```
+artifacts/
+  yieldkey/                  # Landing page + full app (React + Vite)
+    src/
+      pages/
+        Home.tsx              # Public landing page
+        Login.tsx             # Login page
+        Register.tsx          # Register page
+        dashboard/
+          Dashboard.tsx        # Property list dashboard
+          PropertyDetail.tsx   # Per-property agent analysis
+          Agents.tsx           # All 15 agents showcase
+          Settings.tsx         # Account + subscription settings
+      components/
+        Layout.tsx             # Sidebar layout for dashboard
+        AddPropertyModal.tsx   # Property creation form
+        WaitlistForm.tsx       # Public waitlist form
+        MockDashboard.tsx      # Hero section visual
+      hooks/
+        use-auth.ts            # Auth hooks (useUser, useLogin, useRegister, useLogout)
+        use-properties.ts      # Property CRUD hooks
+        use-analyses.ts        # Analysis hooks
+      lib/
+        api.ts                 # fetchApi utility (token injection, 401 handling)
+        agents.ts              # Agent catalog constant
+  api-server/                 # Express 5 backend
+    src/
+      routes/
+        auth.ts                # POST /auth/register, /auth/login, /auth/logout, GET /auth/me
+        properties.ts          # CRUD /properties + /properties/:id/analyses
+        waitlist.ts            # POST /waitlist, GET /waitlist/export
+      lib/
+        auth.ts                # JWT sign/verify + requireAuth middleware
+
+lib/
+  db/src/schema/
+    users.ts                  # users table
+    properties.ts             # properties table
+    analyses.ts               # analyses table
+    waitlist.ts               # waitlist table
 ```
 
-## Waitlist System
+## Auth System
 
-### How it works
+- JWT tokens stored in `localStorage` as `yk_token`
+- 30-day expiry
+- All dashboard routes protected — redirect to /login if no token
+- 401 responses auto-clear token and redirect to /login
+- Change JWT_SECRET env var in production
 
-- Users submit their name, email, and investor type via the form on the landing page
-- POST `/api/waitlist` stores the entry in PostgreSQL
-- Duplicate emails are rejected with a 409 response
-- Success response includes the user's position number on the waitlist
+## The 15 Agent Roster
 
-### Where signups are stored
+| Category | Name | Role |
+|---|---|---|
+| underwriting | Miles | Runs the numbers, STR/MTR/LTR comparison |
+| acquisitions | Avery | Market fit and acquisition opportunity |
+| risk | Rhea | Downside risk, regulation, weak assumptions |
+| revenue | Kai | Pricing and revenue strategy |
+| setup | Sloane | Setup, furnishing, guest-readiness |
+| portfolio | Theo | Portfolio thinking, not one-off deals |
+| accounting | Morgan | Income, expenses, financial reporting |
+| tax | Quinn | Tax strategy, deductions, entity structure |
+| financing | Blake | Loan options, rates, leverage strategy |
+| marketing | Sage | Brand, listings, guest acquisition |
+| legal | Drew | Contracts, compliance, liability |
+| hr | Jordan | Hiring, contractors, team operations |
+| operations | Casey | Systems, processes, efficiency |
+| property_management | Riley | Tenant relations, maintenance, retention |
+| design | Finley | Interior design, staging, visual appeal |
 
-PostgreSQL table: `waitlist`
-Columns: `id`, `first_name`, `email`, `investor_type`, `created_at`, `ip_address`
+## Analysis Engine
 
-### How to export leads
+Currently uses smart placeholder analysis responses per agent category. Once the master spreadsheet is provided, the `runAnalysis()` function in `artifacts/api-server/src/routes/properties.ts` should be updated to:
+1. Parse the spreadsheet inputs for the property
+2. Run calculations against the spreadsheet template
+3. Return structured outputs per agent
+
+## API Routes
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | /api/auth/register | No | Register user |
+| POST | /api/auth/login | No | Login |
+| POST | /api/auth/logout | No | Logout |
+| GET | /api/auth/me | Yes | Current user |
+| GET | /api/properties | Yes | List user properties |
+| POST | /api/properties | Yes | Add property |
+| GET | /api/properties/:id | Yes | Get property |
+| DELETE | /api/properties/:id | Yes | Delete property |
+| GET | /api/properties/:id/analyses | Yes | List analyses |
+| POST | /api/properties/:id/analyses | Yes | Run agent analysis |
+| POST | /api/waitlist | No | Join waitlist |
+| GET | /api/waitlist/export?adminKey= | No | Export waitlist CSV |
+
+## Waitlist Export
 
 ```bash
-# Replace 'yieldkey-admin' with your ADMIN_KEY env var (or use the default)
-curl "https://your-domain.replit.app/api/waitlist/export?adminKey=yieldkey-admin" -o waitlist.csv
+curl "https://your-domain/api/waitlist/export?adminKey=yieldkey-admin" -o leads.csv
 ```
 
-Set `ADMIN_KEY` environment variable to change the default admin key.
+Set `ADMIN_KEY` env var to change the default key.
+
+## Customization Priority
+
+1. **Branding/logo** — `artifacts/yieldkey/src/components/Layout.tsx` and page headers
+2. **Spreadsheet integration** — `artifacts/api-server/src/routes/properties.ts` → `runAnalysis()`
+3. **Subscription tiers** — connect Stripe to `users.subscriptionTier`
+4. **Agent copy** — `artifacts/yieldkey/src/lib/agents.ts`
+5. **JWT secret** — Set `JWT_SECRET` env var in production
+6. **Admin key** — Set `ADMIN_KEY` env var in production
 
 ## Running Locally
 
 ```bash
-# Install dependencies
 pnpm install
-
-# Push DB schema
 pnpm --filter @workspace/db run push
-
-# Start API server
-pnpm --filter @workspace/api-server run dev
-
-# Start frontend (separate terminal)
-pnpm --filter @workspace/yieldkey run dev
+# Terminal 1: pnpm --filter @workspace/api-server run dev
+# Terminal 2: pnpm --filter @workspace/yieldkey run dev
 ```
-
-## API Routes
-
-- `POST /api/waitlist` — join the waitlist
-- `GET /api/waitlist/export?adminKey=<key>` — export all entries as CSV
-- `GET /api/healthz` — health check
-
-## Customization Guide
-
-### What to swap first:
-1. **Branding** — `artifacts/yieldkey/src/App.tsx` and nav logo in `Home.tsx`
-2. **Color theme** — `artifacts/yieldkey/src/index.css` (CSS variables)
-3. **Copy** — `artifacts/yieldkey/src/pages/Home.tsx`
-4. **Agent avatars** — `artifacts/yieldkey/src/pages/Home.tsx` (team section)
-5. **Admin key** — Set `ADMIN_KEY` environment variable
-6. **Dashboard mockup** — `artifacts/yieldkey/src/components/MockDashboard.tsx`
-
-## TypeScript & Composite Projects
-
-- `lib/*` packages are composite and emit declarations via `tsc --build`.
-- Root `tsconfig.json` is a solution file for libs only.
-- Always typecheck from root: `pnpm run typecheck`

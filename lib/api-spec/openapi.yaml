@@ -1,23 +1,28 @@
 openapi: 3.1.0
 info:
   title: Api
-  version: 0.1.0
-  description: API specification
+  version: 0.2.0
+  description: YieldKey API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
   - name: waitlist
     description: Waitlist operations
+  - name: properties
+    description: Property management
+  - name: analyses
+    description: Property analysis by agent
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -25,12 +30,248 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /properties:
+    get:
+      operationId: listProperties
+      tags: [properties]
+      summary: List user properties
+      responses:
+        "200":
+          description: List of properties
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Property"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createProperty
+      tags: [properties]
+      summary: Add a property
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePropertyRequest"
+      responses:
+        "201":
+          description: Property created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /properties/{id}:
+    get:
+      operationId: getProperty
+      tags: [properties]
+      summary: Get property details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Property details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteProperty
+      tags: [properties]
+      summary: Delete a property
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /properties/{id}/analyses:
+    get:
+      operationId: listAnalyses
+      tags: [analyses]
+      summary: List analyses for a property
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Analyses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Analysis"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: runAnalysis
+      tags: [analyses]
+      summary: Run agent analysis for a property
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RunAnalysisRequest"
+      responses:
+        "201":
+          description: Analysis started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Analysis"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /waitlist:
     post:
       operationId: joinWaitlist
       tags: [waitlist]
       summary: Join waitlist
-      description: Add an email to the waitlist
       requestBody:
         required: true
         content:
@@ -39,7 +280,7 @@ paths:
               $ref: "#/components/schemas/WaitlistRequest"
       responses:
         "201":
-          description: Successfully joined waitlist
+          description: Successfully joined
           content:
             application/json:
               schema:
@@ -56,12 +297,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+
   /waitlist/export:
     get:
       operationId: exportWaitlist
       tags: [waitlist]
       summary: Export waitlist as CSV
-      description: Download all waitlist entries as CSV
       parameters:
         - name: adminKey
           in: query
@@ -81,6 +322,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -88,8 +330,221 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required: [error, message]
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success, message]
+
+    RegisterRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+          maxLength: 100
+        lastName:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+      required: [email, password]
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required: [email, password]
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+      required: [user, token]
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        subscriptionTier:
+          type: string
+          enum: [free, starter, pro, enterprise]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, email, subscriptionTier, createdAt]
+
+    CreatePropertyRequest:
+      type: object
+      properties:
+        address:
+          type: string
+          maxLength: 500
+        city:
+          type: string
+          maxLength: 100
+        state:
+          type: string
+          maxLength: 50
+        zipCode:
+          type: string
+          maxLength: 10
+        askingPrice:
+          type: number
+        bedrooms:
+          type: integer
+        bathrooms:
+          type: number
+        squareFeet:
+          type: integer
+        yearBuilt:
+          type: integer
+        propertyType:
+          type: string
+          enum: [single_family, multi_family, condo, townhouse, commercial]
+        notes:
+          type: string
+          maxLength: 2000
+      required: [address, city, state, askingPrice]
+
+    Property:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zipCode:
+          type: string
+          nullable: true
+        askingPrice:
+          type: number
+        bedrooms:
+          type: integer
+          nullable: true
+        bathrooms:
+          type: number
+          nullable: true
+        squareFeet:
+          type: integer
+          nullable: true
+        yearBuilt:
+          type: integer
+          nullable: true
+        propertyType:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [active, archived]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, userId, address, city, state, askingPrice, status, createdAt, updatedAt]
+
+    RunAnalysisRequest:
+      type: object
+      properties:
+        agentCategory:
+          type: string
+          enum:
+            - underwriting
+            - acquisitions
+            - risk
+            - revenue
+            - setup
+            - portfolio
+            - accounting
+            - tax
+            - financing
+            - marketing
+            - legal
+            - hr
+            - operations
+            - property_management
+            - design
+      required: [agentCategory]
+
+    Analysis:
+      type: object
+      properties:
+        id:
+          type: integer
+        propertyId:
+          type: integer
+        agentCategory:
+          type: string
+        agentName:
+          type: string
+        status:
+          type: string
+          enum: [pending, in_progress, complete, error]
+        summary:
+          type: string
+          nullable: true
+        findings:
+          type: object
+          nullable: true
+          additionalProperties: true
+        recommendation:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required: [id, propertyId, agentCategory, agentName, status, createdAt]
+
     WaitlistRequest:
       type: object
       properties:
@@ -108,8 +563,8 @@ components:
             - long_term_landlord
             - agent_operator
             - just_exploring
-      required:
-        - email
+      required: [email]
+
     WaitlistResponse:
       type: object
       properties:
@@ -119,17 +574,4 @@ components:
           type: string
         position:
           type: integer
-      required:
-        - success
-        - message
-        - position
-    ErrorResponse:
-      type: object
-      properties:
-        error:
-          type: string
-        message:
-          type: string
-      required:
-        - error
-        - message
+      required: [success, message, position]

@@ -5,8 +5,9 @@
  * YieldKey API specification
  * OpenAPI spec version: 0.2.0
  */
+import type { User } from "./user";
 
-export interface ErrorResponse {
-  error: string;
-  message: string;
+export interface AuthResponse {
+  user: User;
+  token: string;
 }

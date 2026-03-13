@@ -5,12 +5,17 @@
  * YieldKey API specification
  * OpenAPI spec version: 0.2.0
  */
-import type { WaitlistRequestInvestorType } from "./waitlistRequestInvestorType";
 
-export interface WaitlistRequest {
+export interface RegisterRequest {
   /** @maxLength 100 */
   firstName?: string;
+  /** @maxLength 100 */
+  lastName?: string;
   /** @maxLength 255 */
   email: string;
-  investorType?: WaitlistRequestInvestorType;
+  /**
+   * @minLength 8
+   * @maxLength 100
+   */
+  password: string;
 }
