@@ -44,41 +44,37 @@
 }
 
 :root {
-  /* Premium Dark Fintech Palette */
-  --background: 224 71% 4%; /* Very deep slate/navy */
-  --foreground: 210 40% 98%; /* Clean off-white */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 28%;
   
-  --card: 224 71% 6%; /* Slightly lighter than bg */
-  --card-foreground: 210 40% 98%;
-  --card-border: 224 30% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 28%;
+  --card-border: 0 0% 90%;
   
-  --popover: 224 71% 6%;
-  --popover-foreground: 210 40% 98%;
-  --popover-border: 224 30% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 28%;
+  --popover-border: 0 0% 90%;
   
-  --primary: 160 84% 39%; /* Emerald Green */
+  --primary: 2 100% 67%; /* Airbnb coral-red #FF5A5F */
   --primary-foreground: 0 0% 100%;
   
-  --secondary: 220 20% 12%;
-  --secondary-foreground: 210 40% 98%;
+  --secondary: 0 0% 97%;
+  --secondary-foreground: 0 0% 28%;
   
-  --muted: 220 20% 12%;
-  --muted-foreground: 215 20% 65%;
+  --muted: 0 0% 97%;
+  --muted-foreground: 0 0% 44%;
   
-  --accent: 220 20% 12%;
-  --accent-foreground: 210 40% 98%;
+  --accent: 0 0% 97%;
+  --accent-foreground: 0 0% 28%;
   
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive: 16 80% 42%;
+  --destructive-foreground: 0 0% 100%;
   
-  --border: 224 30% 15%;
-  --input: 224 30% 15%;
-  --ring: 160 84% 39%;
+  --border: 0 0% 87%;
+  --input: 0 0% 87%;
+  --ring: 2 100% 67%;
   
   --radius: 0.75rem;
-
-  /* Custom Glow Effects */
-  --glow-primary: 160 84% 39%;
 }
 
 @layer base {
@@ -98,19 +94,19 @@
 
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/60;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900;
   }
   
   .text-gradient-primary {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#FF5A5F] to-[#E00B41];
   }
 
   .glass-card {
-    @apply bg-card/40 backdrop-blur-xl border border-white/5 shadow-2xl;
+    @apply bg-white border border-border shadow-sm;
   }
 
   .glass-panel {
-    @apply bg-background/60 backdrop-blur-2xl border border-white/10;
+    @apply bg-white border border-border shadow-sm;
   }
 }
 
@@ -123,10 +119,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted));
+  background: hsl(var(--border));
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--border));
+  background: hsl(var(--muted-foreground));
 }
