@@ -1,0 +1,69 @@
+This is a set of changes to the existing YieldKey landing page in this Replit project. The site is live and functional. Do NOT rebuild from scratch. Modify the existing code in place. Do NOT change the product name, logo, or brand color (coral/salmon red). Preserve all current signup form functionality and form submission logic. Work through every section below in order.
+MOBILE TEXT READABILITY (CRITICAL — FIX FIRST)
+The site looks good on desktop and tablet but text is too small and cramped on mobile (below 768px). Before doing anything else, fix these issues:
+The three strategy comparison cards (Airbnb, Mid-Term, Long-Term) in the property demo section are being forced side-by-side on mobile. The text is getting cut off and the numbers are barely readable. On mobile, stack these three cards vertically instead of side-by-side. Each card should be full-width with the strategy name, cash flow number, cap rate, occupancy, and the tag (Recommended Path, Solid Fallback, Negative CF) all clearly readable at a glance. Keep the horizontal layout on tablet and desktop.
+The monospace AGENT OUTPUT text inside each agent card is too small on mobile. It looks like it is rendering around 11-12px. Increase it to at least 14px on mobile. If the monospace font is making it feel cramped, switch to the regular body font on mobile and use a light background color or left border to differentiate the output block instead. Set line-height to at least 1.5 so the text breathes.
+The fake browser URL bar text (app.yieldkey.com/deal/1248-oak…) is tiny on mobile. Either hide the URL bar on mobile and just keep the three colored dots as a minimal browser chrome indicator, or increase the text to at least 12px.
+Do a full pass across every section on mobile and make sure body text is at least 16px, subheadlines are at least 14-15px, no text is clipped or truncated by container overflow, and all cards have at least 16px internal padding so text is never flush against card edges.
+HERO SECTION — TIGHTEN AND CONVERT
+The hero is close but still has room to improve for conversion. Make these changes:
+Reduce the gap between the YieldKey logo/nav and the Private Beta Now Open pill. There is still too much dead space at the top on mobile. Every pixel of vertical space above the form costs signups.
+Change the subheadline from “Enter any address. Compare Airbnb, mid-term, and long-term cash flow — with risk flags, regulatory checks, and a clear recommendation. Powered by 6 AI agents.” to this: “Paste any address. In 90 seconds, see projected cash flow for Airbnb, mid-term, and long-term rentals — plus risk flags, regulation checks, and a clear buy-or-pass signal. Powered by 6 AI agents working simultaneously.” The addition of “90 seconds” and “buy-or-pass signal” adds specificity and urgency. People want to know how fast it is and what the output looks like.
+Simplify the hero signup form. Remove the “First name (optional)” field from the hero form entirely. Just show Email address and the investor type dropdown and the Get Early Access button. Fewer fields means higher conversion. If you want to collect first names, do it on a confirmation or thank-you screen after they submit. Keep the first name field in the bottom CTA form if you want, but the hero form should be as frictionless as possible.
+Below the Get Early Access button, change the waitlist counter from “847 investors already on the waitlist” to “Join 847 investors already on the waitlist” — the word “Join” makes it an action, not just a stat. Also add a third micro-line: “First 1,000 users lock in founding member pricing” in a slightly smaller font. This creates real urgency because it implies a cap.
+ADD A STICKY MOBILE CTA
+The page is long. On mobile, many visitors will scroll past the hero form and never scroll all the way down to the bottom CTA. Add a sticky floating bar at the bottom of the screen on mobile only (hidden on desktop/tablet) that appears after the user scrolls past the hero section. It should contain a compact “Get Early Access →” button in coral that, when tapped, smooth-scrolls back up to the hero signup form. Keep it minimal — just the button and maybe “Free beta · 847 on waitlist” in tiny text next to it. Give it a white background with a subtle top shadow so it sits above the content. Make sure it does not overlap with any important content and has a small close/dismiss X in case someone wants to get rid of it.
+PROPERTY DEMO SECTION — MAKE IT FEEL LIKE THE REAL PRODUCT
+This section is strong but can be more immersive. Make these changes:
+Add a subtle typing/loading animation when the section first scrolls into view. Something like the property address “1248 Oakwood Ave, Austin TX” types itself out character by character, and then the BUY SIGNAL badge fades in, and then the three strategy cards stagger in from the bottom. This makes it feel like you are watching the product work in real-time. Keep the animation fast (under 3 seconds total) so it does not feel slow.
+After the Neighborhood Insight card, add one more insight card with a green/teal left border and a chart icon. Text: “5-Year Projection: At current trajectory, this property hits $427K equity at year 5 with STR strategy vs $298K with LTR. STR outperforms by $129K even after accounting for higher vacancy risk.” This shows the depth of the long-term modeling and makes the analysis feel comprehensive rather than surface-level.
+Make the BUY SIGNAL badge pulse gently (a soft scale animation, like 1.0 to 1.03 and back, every 2-3 seconds). This draws the eye and makes the signal feel alive and dynamic rather than static.
+AGENT SECTION — MAKE IT SHORTER AND MORE IMPACTFUL ON MOBILE
+The agent section with six full cards is very long on mobile. By the time someone scrolls through all six agents, they may have lost interest. Fix this:
+On mobile only, convert the six agent cards into a horizontal swipeable carousel. Show one agent card at a time with a swipe indicator (dots or a subtle arrow). This dramatically reduces the vertical scroll distance while keeping all the content accessible. On desktop and tablet, keep the current vertical card layout since there is more screen real estate.
+Add a small “1 of 6” or dot indicator below the carousel so users know there is more to see.
+Alternatively if a carousel is too complex to implement cleanly, use an accordion/collapse pattern on mobile where each agent shows just their name, avatar, and role tag, and tapping expands to reveal the output snippet. Default the first agent (Miles) to expanded so visitors can see what the output looks like.
+Either approach works — pick whichever you can implement more cleanly. The goal is to reduce scroll fatigue on mobile while keeping the content.
+FEATURES SECTION — ADD VISUAL PROOF TO EACH CARD
+The feature cards (Compare STR/MTR/LTR, Surface market and regulation risk, Deep cash flow and return analysis, Clear buy/pass recommendation, Fallback plan, Save and review deals) are solid content but they feel text-heavy. For the two most important cards, add a small visual element:
+For “Surface market and regulation risk” — the list of risk pills (STR permit required, HOA rental restrictions, 90-day rule active, Market saturation flag) is great. Keep those. But also add a small “Checked 847 local ordinances” or “Updated March 2026” line in small gray text below the pills to imply the data is comprehensive and current.
+For “Compare STR / MTR / LTR side by side” — add a tiny inline bar chart or three small horizontal bars (one for each strategy) showing relative cash flow. Does not need to be interactive, just a static visual element to break up the text. Use coral for STR (highest), a muted tone for MTR, and gray for LTR. Even a simple CSS bar chart would work.
+For “Deep cash flow and return analysis” — add a line like “Adjust vacancy, CapEx, management fees, and 12 other assumptions” to emphasize the granularity. Investors want to know they can tweak the model.
+For “Save and review deals over time” — add “Export to PDF or share with your partner/lender” as a sub-line. This hits a real pain point for investors who need to show deals to business partners or loan officers.
+THREE STEPS SECTION — ADD CONNECTING FLOW
+The three steps (Enter a property, Compare strategies, Invest with clarity) need a visual connector. Add a vertical line or dashed connector between the three numbered circles so it reads as a clear progression/flow rather than three isolated items. On desktop you can make this horizontal. On mobile keep it vertical.
+Add a subtle downward arrow or chevron between each step to reinforce the progression.
+ADD A MID-PAGE CTA BREAK
+After the agent section and before the features section, insert a compact inline CTA. This is for visitors who are already sold and do not need to see the features. Style it as a simple centered block with:
+Heading: “Ready to underwrite your first deal?”
+A single email input field and a coral “Get Early Access →” button (same submission logic as the other forms).
+Below the button: “Takes 10 seconds. No credit card.”
+Give this a very light coral/pink background (#FFF5F5 or similar) to visually separate it from the surrounding sections. Keep it compact — no more than 200px tall on mobile.
+WHO USES YIELDKEY SECTION — ADD SPECIFICITY
+The audience pills (First-time rental investors, Airbnb hosts scaling up, Long-term landlords, Out-of-state buyers, House hackers, Small portfolio investors) are fine but they could be more compelling with a one-line pain point under each one. Change the layout so each pill becomes a small card with the audience type as the heading and a one-liner below:
+“First-time rental investors” → “Stop relying on spreadsheets and gut feel for your first deal.”
+“Airbnb hosts scaling up” → “Know if your next market has STR-friendly regulations before you close.”
+“Long-term landlords” → “See if switching a property to mid-term or Airbnb would double your cash flow.”
+“Out-of-state buyers” → “Underwrite markets you have never visited with local-level data.”
+“House hackers” → “Model the rental income on your owner-occupied property before you buy.”
+“Small portfolio investors” → “Think in portfolios, not one-off deals. Balance risk across strategies.”
+These pain points make each audience segment feel seen and understood. Keep the cards compact — the heading and one-liner only, no icons needed.
+BOTTOM CTA — FINAL URGENCY PUSH
+The bottom coral gradient CTA section is good. Make these final tweaks:
+Change “Join 800+ investors already on the waitlist. Beta spots are limited.” to “1,000 founding member spots. 847 claimed. Get in before they are gone.” This is much more specific and creates real scarcity. The declining number (153 spots left, implied) is more motivating than a vague “limited” claim.
+Keep the bottom form as email-only with the Get Early Access button. Add the same “Free beta access · No credit card required” microcopy.
+Add a single line in smaller text below the form: “We will never spam you. Expect one email when your beta access is ready.” This addresses the unspoken objection every visitor has about giving out their email.
+FOOTER — KEEP IT CLEAN
+The footer with “YieldKey © 2026 · Built by Castle Capital” and the X and LinkedIn icons is good. Add a “Privacy Policy” text link (it can be a placeholder href for now) to add legitimacy. Also consider adding “Questions? team@yieldkey.com” or whatever contact email you want — having a human contact option builds trust even if nobody emails.
+ADD SUBTLE TRUST SIGNALS THROUGHOUT
+Sprinkle these lightweight trust signals across the page. They do not need their own section — just integrate them naturally:
+Somewhere near the hero or demo section, add a small line: “Built by real estate investors, for real estate investors.” This establishes credibility without a full “About us” section.
+Near the features section or agent section, add: “Analyzing data from 200+ markets across the US” or similar. Even if approximate, it signals scale and coverage.
+Near the regulation risk feature card, add: “Regulation database updated weekly” in small text. This implies ongoing maintenance and data freshness, which is a major concern for STR investors who worry about regulatory changes.
+ANIMATION AND POLISH NOTES
+Add scroll-triggered fade-up animations to all section headings and cards. Use a simple CSS animation with an intersection observer or Framer Motion. Keep the animation duration fast (300-400ms) and use a slight upward translate (20px) combined with opacity. Do not add bounce, spin, or any other heavy animation.
+The Private Beta Now Open pill in the hero should have a subtle pulse on the red dot — just a gentle opacity pulse (1.0 to 0.4 and back) on a 2-second loop. This signals “live” and draws attention.
+Make sure the “Get Early Access →” button on hover has a slight darkening or scale-up effect (scale 1.02) so it feels interactive and clickable.
+All form inputs should have a clear focus state — a coral border or subtle coral glow when selected so users know where their cursor is.
+PERFORMANCE NOTES
+Keep the page fast. No heavy images, videos, or large JavaScript bundles. All visual elements should be CSS-based (gradients, borders, shadows) or lightweight SVG. The animations should use CSS transforms and opacity only (GPU-accelerated properties) to avoid jank on mobile devices. Test on a real phone if possible — the iPhone viewport shown in the screenshots is the primary target.

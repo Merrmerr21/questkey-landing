@@ -24,12 +24,19 @@ type FormData = z.infer<typeof formSchema>;
 interface WaitlistFormProps {
   className?: string;
   variant?: "default" | "minimal";
+  hideFirstName?: boolean;
+  hideSocialProof?: boolean;
 }
 
-export function WaitlistForm({ className, variant = "default" }: WaitlistFormProps) {
+export function WaitlistForm({
+  className,
+  variant = "default",
+  hideFirstName = false,
+  hideSocialProof = false,
+}: WaitlistFormProps) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  
+
   const { mutate, isPending } = useJoinWaitlist({
     mutation: {
       onSuccess: () => {
@@ -51,11 +58,7 @@ export function WaitlistForm({ className, variant = "default" }: WaitlistFormPro
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: "",
-      email: "",
-      investorType: undefined,
-    }
+    defaultValues: { firstName: "", email: "", investorType: undefined }
   });
 
   const onSubmit = (data: FormData) => {
@@ -65,7 +68,7 @@ export function WaitlistForm({ className, variant = "default" }: WaitlistFormPro
 
   if (isSuccess) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className={cn("bg-green-50 border border-green-200 rounded-2xl p-8 text-center", className)}
@@ -79,11 +82,14 @@ export function WaitlistForm({ className, variant = "default" }: WaitlistFormPro
     );
   }
 
+  const showFirstName = variant === "default" && !hideFirstName;
+  const showDropdown = variant === "default";
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className={cn("w-full space-y-3", className)}>
       <AnimatePresence>
         {errorMessage && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -97,8 +103,8 @@ export function WaitlistForm({ className, variant = "default" }: WaitlistFormPro
         )}
       </AnimatePresence>
 
-      <div className={cn("grid gap-3", variant === "default" ? "sm:grid-cols-2" : "grid-cols-1")}>
-        {variant === "default" && (
+      <div className={cn("grid gap-3", showFirstName ? "sm:grid-cols-2" : "grid-cols-1")}>
+        {showFirstName && (
           <div>
             <input
               {...form.register("firstName")}
@@ -109,14 +115,16 @@ export function WaitlistForm({ className, variant = "default" }: WaitlistFormPro
           </div>
         )}
 
-        <div className={cn(variant === "default" ? "" : "col-span-full")}>
+        <div className={cn(!showFirstName ? "col-span-full" : "")}>
           <input
             {...form.register("email")}
             placeholder="Email address *"
             type="email"
             className={cn(
               "w-full bg-white border rounded-xl px-4 py-3 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm",
-              form.formState.errors.email ? "border-destructive/50 focus:ring-destructive/50 focus:border-destructive" : "border-border"
+              form.formState.errors.email
+                ? "border-destructive/50 focus:ring-destructive/50 focus:border-destructive"
+                : "border-border"
             )}
             disabled={isPending}
           />
@@ -125,8 +133,8 @@ export function WaitlistForm({ className, variant = "default" }: WaitlistFormPro
           )}
         </div>
 
-        {variant === "default" && (
-          <div className="sm:col-span-2">
+        {showDropdown && (
+          <div className={cn(showFirstName ? "sm:col-span-2" : "col-span-full")}>
             <div className="relative">
               <select
                 {...form.register("investorType")}
@@ -157,26 +165,36 @@ export function WaitlistForm({ className, variant = "default" }: WaitlistFormPro
           <div className="absolute inset-0 bg-white/15 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
           <span className="relative flex items-center justify-center gap-2 text-sm">
             {isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Submitting...
-              </>
+              <><Loader2 className="w-4 h-4 animate-spin" />Submitting...</>
             ) : (
               "Get Early Access →"
             )}
           </span>
         </button>
 
-        <div className="flex flex-col items-center gap-1.5">
-          <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Lock className="w-3 h-3" />
-            Free beta access · No credit card required
-          </p>
-          <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Users className="w-3 h-3 text-primary" />
-            <span><span className="font-semibold text-foreground">847 investors</span> already on the waitlist</span>
-          </p>
-        </div>
+        {!hideSocialProof && (
+          <div className="flex flex-col items-center gap-1.5">
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Lock className="w-3 h-3" />
+              Free beta access · No credit card required
+            </p>
+            {variant === "default" ? (
+              <>
+                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Users className="w-3 h-3 text-primary" />
+                  <span>Join <span className="font-semibold text-foreground">847 investors</span> already on the waitlist</span>
+                </p>
+                <p className="text-[11px] text-muted-foreground/70 italic">
+                  First 1,000 users lock in founding member pricing
+                </p>
+              </>
+            ) : (
+              <p className="text-[11px] text-muted-foreground/70 text-center leading-relaxed">
+                We'll never spam you. Expect one email when your beta access is ready.
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </form>
   );
