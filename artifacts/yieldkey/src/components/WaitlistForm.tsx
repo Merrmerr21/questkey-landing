@@ -3,11 +3,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { CheckCircle2, AlertCircle, Loader2, Lock, Users } from "lucide-react";
 import { useJoinWaitlist } from "@workspace/api-client-react";
 import { cn } from "@/lib/utils";
 
-// Schema matching the backend WaitlistRequest
 const formSchema = z.object({
   firstName: z.string().max(100).optional(),
   email: z.string().email("Please enter a valid email address").max(255),
@@ -39,7 +38,6 @@ export function WaitlistForm({ className, variant = "default" }: WaitlistFormPro
       },
       onError: (error: any) => {
         setIsSuccess(false);
-        // Extract error message from API response if possible
         if (error?.response?.data?.message) {
           setErrorMessage(error.response.data.message);
         } else if (error?.response?.status === 409) {
@@ -76,13 +74,13 @@ export function WaitlistForm({ className, variant = "default" }: WaitlistFormPro
           <CheckCircle2 className="w-6 h-6 text-green-600" />
         </div>
         <h3 className="text-xl font-display font-bold text-foreground mb-2">You're on the list!</h3>
-        <p className="text-muted-foreground">We'll be in touch soon with your early access invitation.</p>
+        <p className="text-muted-foreground text-sm">We'll be in touch soon with your early access invitation.</p>
       </motion.div>
     );
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className={cn("w-full space-y-4", className)}>
+    <form onSubmit={form.handleSubmit(onSubmit)} className={cn("w-full space-y-3", className)}>
       <AnimatePresence>
         {errorMessage && (
           <motion.div 
@@ -91,7 +89,7 @@ export function WaitlistForm({ className, variant = "default" }: WaitlistFormPro
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-xl flex items-start gap-3 text-sm mb-4">
+            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-xl flex items-start gap-3 text-sm mb-2">
               <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
               <p>{errorMessage}</p>
             </div>
@@ -99,77 +97,87 @@ export function WaitlistForm({ className, variant = "default" }: WaitlistFormPro
         )}
       </AnimatePresence>
 
-      <div className={cn("grid gap-4", variant === "default" ? "sm:grid-cols-2" : "grid-cols-1")}>
-        {/* First Name (Optional) */}
+      <div className={cn("grid gap-3", variant === "default" ? "sm:grid-cols-2" : "grid-cols-1")}>
         {variant === "default" && (
-          <div className="space-y-1">
+          <div>
             <input
               {...form.register("firstName")}
               placeholder="First name (optional)"
-              className="w-full bg-white border border-border rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 shadow-sm"
+              className="w-full bg-white border border-border rounded-xl px-4 py-3 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm"
               disabled={isPending}
             />
           </div>
         )}
 
-        {/* Email (Required) */}
-        <div className={cn("space-y-1", variant === "default" ? "" : "col-span-full")}>
+        <div className={cn(variant === "default" ? "" : "col-span-full")}>
           <input
             {...form.register("email")}
             placeholder="Email address *"
             type="email"
             className={cn(
-              "w-full bg-white border rounded-xl px-4 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 shadow-sm",
+              "w-full bg-white border rounded-xl px-4 py-3 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm",
               form.formState.errors.email ? "border-destructive/50 focus:ring-destructive/50 focus:border-destructive" : "border-border"
             )}
             disabled={isPending}
           />
           {form.formState.errors.email && (
-            <p className="text-xs text-destructive pl-1">{form.formState.errors.email.message}</p>
+            <p className="text-xs text-destructive pl-1 mt-1">{form.formState.errors.email.message}</p>
           )}
         </div>
 
-        {/* Investor Type */}
         {variant === "default" && (
-          <div className="space-y-1 sm:col-span-2">
+          <div className="sm:col-span-2">
             <div className="relative">
               <select
                 {...form.register("investorType")}
-                className="w-full appearance-none bg-white border border-border rounded-xl px-4 py-3.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 disabled:opacity-50 shadow-sm"
+                className="w-full appearance-none bg-white border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all disabled:opacity-50 shadow-sm"
                 disabled={isPending}
               >
                 <option value="" disabled hidden>What best describes you?</option>
-                <option value="first_time_investor" className="bg-white text-foreground">First-time investor</option>
-                <option value="airbnb_host" className="bg-white text-foreground">Active Airbnb host</option>
-                <option value="long_term_landlord" className="bg-white text-foreground">Long-term landlord</option>
-                <option value="agent_operator" className="bg-white text-foreground">Agent / Operator</option>
-                <option value="just_exploring" className="bg-white text-foreground">Just exploring</option>
+                <option value="first_time_investor">First-time investor</option>
+                <option value="airbnb_host">Active Airbnb host</option>
+                <option value="long_term_landlord">Long-term landlord</option>
+                <option value="agent_operator">Agent / Operator</option>
+                <option value="just_exploring">Just exploring</option>
               </select>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="w-full sm:w-auto relative group overflow-hidden rounded-xl bg-primary px-8 py-3.5 font-semibold text-white shadow-sm hover:shadow-md transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
-      >
-        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-        <span className="relative flex items-center justify-center gap-2">
-          {isPending ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              Submitting...
-            </>
-          ) : (
-            "Get Early Access"
-          )}
-        </span>
-      </button>
+      <div className="flex flex-col gap-3 pt-1">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="w-full relative group overflow-hidden rounded-xl bg-primary px-8 py-3.5 font-semibold text-white shadow-sm hover:shadow-md transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          <div className="absolute inset-0 bg-white/15 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+          <span className="relative flex items-center justify-center gap-2 text-sm">
+            {isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              "Get Early Access →"
+            )}
+          </span>
+        </button>
+
+        <div className="flex flex-col items-center gap-1.5">
+          <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Lock className="w-3 h-3" />
+            Free beta access · No credit card required
+          </p>
+          <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Users className="w-3 h-3 text-primary" />
+            <span><span className="font-semibold text-foreground">847 investors</span> already on the waitlist</span>
+          </p>
+        </div>
+      </div>
     </form>
   );
 }

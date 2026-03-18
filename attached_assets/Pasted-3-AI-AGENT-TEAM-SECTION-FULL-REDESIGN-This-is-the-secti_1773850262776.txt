@@ -1,0 +1,22 @@
+3. AI AGENT TEAM SECTION — FULL REDESIGN
+This is the section that needs the most work. The current version (six colored circles with names and one-line descriptions) feels like a wireframe. Nobody cares about agent names yet — they care about what the agents DO and what output they produce.
+Redesign approach: “Deal Room” concept
+Instead of listing 6 agents as static cards, reimagine this section as a simulated “deal room” workflow. Here’s the structure:
+Section header: “Six AI analysts. One complete picture.” (subheadline: “Every deal gets torn apart from six angles before you see a single number.”)
+Layout: Horizontal scrollable cards (on mobile) / 2x3 grid (on desktop) where each agent card contains:
+	1.	Agent icon (keep the colored circle + letter, but make them slightly larger and add a subtle gradient)
+	2.	Agent name + role tag (keep these)
+	3.	A sample output snippet — this is the key differentiator. Each card should show a realistic 2-3 line quote of what that agent would actually say about the Austin TX example property. This makes the agents feel REAL.
+Sample output snippets for each agent:
+	∙	Miles · UNDERWRITING: Show a mini table — “Cash-on-cash: 14.2% (STR) vs 6.8% (MTR) vs 2.1% (LTR). STR breakeven occupancy: 52%.”
+	∙	Avery · ACQUISITIONS: “Austin 78745 is a strong Airbnb submarket. Median home price up 3.2% YoY but rental demand outpacing supply. Acquisition score: 8.1/10.”
+	∙	Rhea · RISK: “⚠️ Austin requires active STR permit. Current owner has none — factor 45-60 day approval window. Also flagged: HOA restrictions on rentals shorter than 30 days.”
+	∙	Sloane · SETUP: “Estimated furnishing budget: $12,400 for a competitive 3BR listing. Recommend keyless entry + smart thermostat for remote management.”
+	∙	Kai · REVENUE: “Projected ADR: $245/night. Peak season (Mar-May, Sep-Nov) occupancy 78%. Recommend dynamic pricing via PriceLabs — could boost revenue 12-18%.”
+	∙	Theo · PORTFOLIO: “Adding this STR brings your portfolio STR exposure to 60%. Consider your next acquisition as an MTR to balance risk.”
+Each card should have:
+	∙	A subtle frosted glass / glassmorphism card style with a very light colored border matching the agent’s color
+	∙	The sample output in a monospace or slightly different font to make it feel like “agent output”
+	∙	The cards should stagger-animate in on scroll
+Alternative layout option (pick whichever looks better):
+A vertical “conversation/timeline” layout where the agents appear sequentially as if they’re each commenting on the same deal — like a Slack thread or analysis feed. Each agent’s “message” appears with their avatar, name, role tag, and their output snippet. This feels more dynamic and collaborative.
