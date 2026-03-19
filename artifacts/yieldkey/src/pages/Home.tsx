@@ -452,7 +452,7 @@ export default function Home() {
 
       {/* ── 3. AI AGENT TEAM — DEAL ROOM ── */}
       <section id="team" className="py-18 lg:py-24 bg-[#F8F9FA] border-y border-border px-5">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -489,113 +489,138 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Agent feed */}
-            <div className="divide-y divide-border">
-              {agents.map((agent, i) => (
-                <div key={agent.name}>
+            {/* Agent feed — 2 columns on desktop, single column on mobile */}
+            <div className="md:grid md:grid-cols-2">
+
+              {/* Left column: Uri, Avery, Rhea + callout */}
+              <div className="divide-y divide-border md:border-r border-border">
+                {agents.slice(0, 3).map((agent, i) => (
+                  <div key={agent.name}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 14 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ delay: i * 0.08, duration: 0.38 }}
+                      className="px-5 py-4 flex gap-3.5"
+                    >
+                      <div className={`flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white shadow-sm`}>
+                        <agent.Icon className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                          <span className="font-semibold text-sm text-foreground">{agent.name}</span>
+                          <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{agent.role}</span>
+                        </div>
+                        <p className="text-sm text-foreground/80 leading-relaxed">{agent.content}</p>
+                        <div className="flex items-center gap-2 mt-2.5">
+                          <span className="text-[11px] text-muted-foreground">Confidence</span>
+                          <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-1.5 bg-green-500 rounded-full" style={{ width: `${agent.confidence}%` }} />
+                          </div>
+                          <span className="text-[11px] font-semibold text-green-600">{agent.confidence}%</span>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground/50 mt-1">{agent.sources}</p>
+                      </div>
+                    </motion.div>
+
+                    {/* Uri reacts to Rhea */}
+                    {agent.isRhea && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2, duration: 0.38 }}
+                        className="mx-4 mb-4 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex gap-3"
+                      >
+                        <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white">
+                          <Calculator className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                            <span className="text-xs font-bold text-blue-700">Uri — Live Update</span>
+                            <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-semibold">REACTED TO RHEA</span>
+                          </div>
+                          <p className="text-xs text-blue-700/90 leading-relaxed">
+                            Adjusted STR cash flow for 45–60 day permit delay. Net impact: <strong>-$920 in months 1–2</strong>, breakeven by month 4. Revised IRR: <strong>17.8%</strong> (was 18.4%). STR still strongly favored.
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Right column: Sloane, Rex, Pax */}
+              <div className="divide-y divide-border border-t md:border-t-0 border-border">
+                {agents.slice(3).map((agent, i) => (
                   <motion.div
-                    initial={{ opacity: 0, y: 16 }}
+                    key={agent.name}
+                    initial={{ opacity: 0, y: 14 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
-                    transition={{ delay: i * 0.07, duration: 0.4 }}
-                    className="px-5 py-5 flex gap-4"
+                    transition={{ delay: i * 0.08, duration: 0.38 }}
+                    className="px-5 py-4 flex gap-3.5"
                   >
-                    {/* Functional icon avatar */}
-                    <div className={`flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white shadow-sm`}>
-                      <agent.Icon className="w-5 h-5" />
+                    <div className={`flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white shadow-sm`}>
+                      <agent.Icon className="w-4 h-4" />
                     </div>
-
-                    {/* Message content */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                         <span className="font-semibold text-sm text-foreground">{agent.name}</span>
-                        <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                          {agent.role}
-                        </span>
+                        <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{agent.role}</span>
                       </div>
                       <p className="text-sm text-foreground/80 leading-relaxed">{agent.content}</p>
-
-                      {/* Confidence bar */}
-                      <div className="flex items-center gap-2 mt-3">
+                      <div className="flex items-center gap-2 mt-2.5">
                         <span className="text-[11px] text-muted-foreground">Confidence</span>
-                        <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-1.5 bg-green-500 rounded-full"
-                            style={{ width: `${agent.confidence}%` }}
-                          />
+                        <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-green-500 rounded-full" style={{ width: `${agent.confidence}%` }} />
                         </div>
                         <span className="text-[11px] font-semibold text-green-600">{agent.confidence}%</span>
                       </div>
-
-                      {/* Sources */}
-                      <p className="text-[11px] text-muted-foreground/55 mt-1.5">{agent.sources}</p>
+                      <p className="text-[11px] text-muted-foreground/50 mt-1">{agent.sources}</p>
                     </div>
                   </motion.div>
+                ))}
+              </div>
+            </div>
 
-                  {/* Inter-agent callout: Uri reacts to Rhea's findings */}
-                  {agent.isRhea && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 12 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.2, duration: 0.4 }}
-                      className="mx-5 mb-5 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex gap-3"
-                    >
-                      <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white">
-                        <Calculator className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="text-xs font-bold text-blue-700">Uri — Live Update</span>
-                          <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-semibold">
-                            REACTED TO RHEA
-                          </span>
-                        </div>
-                        <p className="text-xs text-blue-700/90 leading-relaxed">
-                          Adjusted STR cash flow to account for 45–60 day permit delay. Net impact:{" "}
-                          <strong>-$920 in months 1–2</strong>, breakeven by month 4. Revised IRR:{" "}
-                          <strong>17.8%</strong> (was 18.4%). Recommendation unchanged — STR still strongly favored.
-                        </p>
-                      </div>
-                    </motion.div>
-                  )}
-                </div>
-              ))}
-
-              {/* Deal Verdict card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1, duration: 0.5 }}
-                className="m-4"
-              >
-                <div className="bg-gray-900 rounded-2xl p-5">
-                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+            {/* Deal Verdict — full width, horizontal layout on desktop */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              className="border-t border-border p-4"
+            >
+              <div className="bg-gray-900 rounded-2xl p-5 md:flex md:gap-8 md:items-start">
+                {/* Left: verdict */}
+                <div className="md:flex-1 mb-4 md:mb-0">
+                  <div className="flex items-center gap-2 mb-2.5 flex-wrap">
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Deal Verdict</span>
                     <span className="text-[10px] bg-primary/25 text-primary px-2 py-0.5 rounded font-bold">6/6 Agents</span>
                     <span className="ml-auto text-[11px] text-gray-500">Confidence: 89%</span>
                   </div>
-                  <div className="flex items-baseline gap-2 mb-4 flex-wrap">
+                  <div className="flex items-baseline gap-2 mb-3 flex-wrap">
                     <span className="text-2xl font-display font-black text-white">BUY</span>
                     <span className="text-base text-primary font-semibold">— STR Strategy Recommended</span>
                   </div>
-                  <div className="space-y-1.5 text-sm text-gray-300 mb-4">
+                  <div className="space-y-1 text-sm text-gray-300">
                     <p>✓ Strong cash flow with manageable regulatory risk</p>
                     <p>✓ Portfolio impact: moderate STR concentration increase</p>
                     <p>✓ Downside protected: MTR at +$920/mo if STR underperforms</p>
                   </div>
-                  <div className="pt-4 border-t border-gray-700/60">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">Recommended Actions</p>
-                    <div className="space-y-1.5 text-sm text-gray-200">
-                      <p>→ Apply for STR permit immediately (45–60 day wait)</p>
-                      <p>→ Budget $12,400 for furnishing and setup</p>
-                      <p>→ Implement dynamic pricing from day one</p>
-                    </div>
+                </div>
+                {/* Right: actions */}
+                <div className="md:flex-1 md:border-l md:border-gray-700/60 md:pl-8 pt-4 md:pt-0 border-t border-gray-700/60 md:border-t-0">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">Recommended Actions</p>
+                  <div className="space-y-1.5 text-sm text-gray-200">
+                    <p>→ Apply for STR permit immediately (45–60 day wait)</p>
+                    <p>→ Budget $12,400 for furnishing and setup</p>
+                    <p>→ Implement dynamic pricing from day one</p>
                   </div>
                 </div>
-              </motion.div>
-            </div>
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* Section bottom CTA */}
