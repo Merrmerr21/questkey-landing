@@ -1,0 +1,13 @@
+Below the existing property analysis browser mockup (the 1248 Oakwood Ave demo), add a second browser window mockup with the same visual style — three colored dots, a URL bar showing something like “app.questkey.com/market/austin-tx”, and a light drop shadow on a subtle gray background. This second mockup should show a market overview analysis instead of a single property analysis.
+
+The market overview mockup should include a header that says MARKET OVERVIEW with the market name (Austin TX) and a market health badge similar to the BUY SIGNAL badge but labeled something like STRONG MARKET or HIGH OPPORTUNITY in a green or coral pill.
+
+Below the header, show three to four recommendation cards for the best property types or strategies in that market. Each card should have a property type (like 3BR Single Family, 2BR Condo, Duplex), the recommended strategy (STR, MTR, or LTR), estimated monthly cash flow, average cap rate, and a short one-line note like “High Airbnb demand near downtown” or “Strong tenant pool near university.” Style these cards similarly to the strategy comparison cards in the property demo — clean, compact, with the cash flow number in a larger bold font.
+
+Below the recommendation cards, add a market stats summary row showing three to four key metrics inline: Median Home Price, Average ADR, STR Occupancy Rate, and YoY Price Growth. Use realistic sample data for Austin TX like median price $425K, ADR $245/night, STR occupancy 68%, price growth +3.2% YoY.
+
+Add a market risk card at the bottom of the mockup similar to the Regulation Risk Detected card in the property demo. Use an orange/amber style with a warning icon and text like “Market Note: Austin STR permit wait times have increased to 45-60 days. 12% of active listings received violation notices in Q4 2025. Factor regulatory overhead into acquisition timeline.”
+
+Add a section label above this second browser mockup in small caps like MARKET INTELLIGENCE with a heading like “Zoom out. See the full picture.” and a subheadline like “Before you pick a property, pick the right market. QuestKey surfaces the best opportunities and flags risks at the market level.”
+
+Use the same scroll-triggered entrance animation as the property demo — the market name types itself out, then the market health badge fades in, then the recommendation cards stagger in from the bottom. Keep the animation fast, under three seconds total.​​​​​​​​​​​​​​​​

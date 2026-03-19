@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { MockDashboard } from "@/components/MockDashboard";
+import { MarketDashboard } from "@/components/MarketDashboard";
 
 // ── Q-with-key-tail logo ──
 // Diagonal tail pointing bottom-right (classic Q shape).
@@ -353,6 +354,26 @@ export default function Home() {
             <p className="text-xs text-muted-foreground/70 mt-1">Analyzing data from 200+ markets across the US</p>
           </motion.div>
           <MockDashboard />
+        </div>
+      </section>
+
+      {/* ── 2b. MARKET INTELLIGENCE ── */}
+      <section className="py-14 lg:py-20 px-5 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.45 }}
+            className="text-center mb-10"
+          >
+            <p className="text-[11px] font-bold text-primary uppercase tracking-[0.15em] mb-2">Market Intelligence</p>
+            <h2 className="text-2xl sm:text-3xl font-display font-bold text-foreground">Zoom out. See the full picture.</h2>
+            <p className="text-muted-foreground mt-3 text-sm max-w-lg mx-auto leading-relaxed">
+              Before you pick a property, pick the right market. QuestKey surfaces the best opportunities and flags risks at the market level.
+            </p>
+          </motion.div>
+          <MarketDashboard />
         </div>
       </section>
 
