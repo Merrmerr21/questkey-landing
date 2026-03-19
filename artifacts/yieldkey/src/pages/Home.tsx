@@ -18,24 +18,25 @@ import { WaitlistForm } from "@/components/WaitlistForm";
 import { MockDashboard } from "@/components/MockDashboard";
 
 // ── Q-with-key-tail logo ──
-// Horizontal tail (not diagonal) avoids confusion with a magnifying glass icon.
-// Downward teeth clearly read as a key bit at small sizes.
+// Diagonal tail pointing bottom-right (classic Q shape).
+// Perpendicular crossbar + shorter second tooth at the tip = clearly a key bit.
 function QuestKeyIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
-      viewBox="0 0 26 24"
+      viewBox="0 0 24 24"
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
       {...props}
     >
-      {/* Q ring — offset slightly left to leave room for tail going right */}
-      <circle cx="10" cy="12" r="7.5" stroke="currentColor" strokeWidth="2.2" />
-      {/* Key stem — horizontal tail going rightward from 3 o'clock */}
-      <line x1="17.5" y1="12" x2="24" y2="12" stroke="currentColor" strokeWidth="2.2" />
-      {/* Key bit — two downward teeth at end of stem */}
-      <line x1="24" y1="12" x2="24" y2="16" stroke="currentColor" strokeWidth="1.8" />
-      <line x1="21.5" y1="12" x2="21.5" y2="15" stroke="currentColor" strokeWidth="1.8" />
+      {/* Q ring */}
+      <circle cx="9.5" cy="9.5" r="6.5" stroke="currentColor" strokeWidth="2.2" />
+      {/* Key stem — diagonal bottom-right at 45° */}
+      <line x1="14.1" y1="14.1" x2="21" y2="21" stroke="currentColor" strokeWidth="2.2" />
+      {/* Key bit — T-crossbar perpendicular to stem at the tip */}
+      <line x1="19.5" y1="22.5" x2="22.5" y2="19.5" stroke="currentColor" strokeWidth="2" />
+      {/* Second shorter tooth partway along the stem */}
+      <line x1="17.8" y1="21" x2="19.8" y2="19" stroke="currentColor" strokeWidth="1.6" />
     </svg>
   );
 }
