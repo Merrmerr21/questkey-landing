@@ -60,7 +60,7 @@ export function MockDashboard() {
           </div>
           {/* URL bar: hidden on mobile, shown on sm+ */}
           <div className="hidden sm:block flex-1 bg-white rounded-md px-3 py-1 text-xs text-gray-400 border border-gray-200 max-w-xs mx-auto font-mono truncate text-center">
-            app.yieldkey.com/deal/1248-oakwood-austin-tx
+            app.questkey.com/deal/1248-oakwood-austin-tx
           </div>
         </div>
 

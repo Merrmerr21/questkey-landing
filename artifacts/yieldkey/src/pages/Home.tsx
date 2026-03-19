@@ -10,23 +10,44 @@ import {
   ChevronDown,
   ChevronRight,
   Lock,
+  MapPin,
+  Menu,
+  X,
 } from "lucide-react";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { MockDashboard } from "@/components/MockDashboard";
 
-// ── Sticky mobile CTA (appears after hero, mobile only) ──
+// ── Q-with-key-tail logo ──
+// Horizontal tail (not diagonal) avoids confusion with a magnifying glass icon.
+// Downward teeth clearly read as a key bit at small sizes.
+function QuestKeyIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 26 24"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      {/* Q ring — offset slightly left to leave room for tail going right */}
+      <circle cx="10" cy="12" r="7.5" stroke="currentColor" strokeWidth="2.2" />
+      {/* Key stem — horizontal tail going rightward from 3 o'clock */}
+      <line x1="17.5" y1="12" x2="24" y2="12" stroke="currentColor" strokeWidth="2.2" />
+      {/* Key bit — two downward teeth at end of stem */}
+      <line x1="24" y1="12" x2="24" y2="16" stroke="currentColor" strokeWidth="1.8" />
+      <line x1="21.5" y1="12" x2="21.5" y2="15" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+// ── Sticky mobile CTA ──
 function StickyMobileCTA() {
   const [visible, setVisible] = useState(false);
-
   useEffect(() => {
     const handler = () => setVisible(window.scrollY > 620);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
-
-  const scrollToForm = () => {
-    document.getElementById("hero-form")?.scrollIntoView({ behavior: "smooth", block: "center" });
-  };
 
   return (
     <AnimatePresence>
@@ -43,7 +64,7 @@ function StickyMobileCTA() {
             847 investors already in
           </p>
           <button
-            onClick={scrollToForm}
+            onClick={() => document.getElementById("hero-form")?.scrollIntoView({ behavior: "smooth", block: "center" })}
             className="flex-shrink-0 bg-primary text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors shadow-sm"
           >
             Get Early Access →
@@ -64,10 +85,12 @@ const staggerContainer = {
   visible: { opacity: 1, transition: { staggerChildren: 0.09 } }
 };
 
-// ── Main page ──
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [expandedAgent, setExpandedAgent] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [addressInput, setAddressInput] = useState("");
+  const [addressSubmitted, setAddressSubmitted] = useState(false);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 50);
@@ -76,12 +99,19 @@ export default function Home() {
   }, []);
 
   const scrollTo = (id: string) => {
+    setMobileMenuOpen(false);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleAddressSearch = () => {
+    if (!addressInput.trim()) return;
+    setAddressSubmitted(true);
+    setTimeout(() => scrollTo("demo"), 300);
   };
 
   const agents = [
     {
-      name: "Miles", role: "Underwriting", initials: "M",
+      name: "Uri", role: "Underwriting", initials: "U",
       color: "from-blue-500 to-indigo-600", border: "border-blue-200", bg: "bg-blue-50/60",
       output: `Cash-on-cash: 14.2% (STR) vs 6.8% (MTR) vs 2.1% (LTR)\nSTR breakeven occupancy: 52%\nIRR at 5-yr exit: 18.4%`
     },
@@ -101,12 +131,12 @@ export default function Home() {
       output: `Furnishing budget: $12,400 for a competitive\n3BR listing. Recommend keyless entry +\nsmart thermostat for remote management.`
     },
     {
-      name: "Kai", role: "Revenue", initials: "K",
+      name: "Rex", role: "Revenue", initials: "R",
       color: "from-[#FF5A5F] to-rose-400", border: "border-rose-200", bg: "bg-rose-50/60",
       output: `Projected ADR: $245/night. Peak season\n(Mar–May, Sep–Nov) occupancy 78%.\nDynamic pricing could boost revenue 12–18%.`
     },
     {
-      name: "Theo", role: "Portfolio", initials: "T",
+      name: "Pax", role: "Portfolio", initials: "P",
       color: "from-cyan-500 to-blue-500", border: "border-cyan-200", bg: "bg-cyan-50/60",
       output: `Adding this STR brings your STR exposure\nto 60%. Consider your next acquisition as\nan MTR to balance risk across the portfolio.`
     }
@@ -139,36 +169,88 @@ export default function Home() {
     { type: "Small portfolio investors", pain: "Think in portfolios, not one-off deals. Balance risk across strategies." }
   ];
 
+  const navLinks = [
+    { label: "How it works", id: "how-it-works" },
+    { label: "AI Agents", id: "team" },
+    { label: "Features", id: "features" },
+  ];
+
   return (
     <div className="min-h-screen bg-background font-sans">
       <StickyMobileCTA />
 
       {/* ── NAV ── */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${scrolled ? "bg-white/90 backdrop-blur-md border-border py-4 shadow-sm" : "bg-transparent border-transparent py-5"}`}>
-        <div className="max-w-7xl mx-auto px-5 flex items-center justify-between">
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${scrolled ? "bg-white/90 backdrop-blur-md border-border shadow-sm" : "bg-transparent border-transparent"}`}>
+        <div className="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between">
+          {/* Logo */}
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="flex items-center gap-2 font-display font-bold text-xl tracking-tight text-foreground"
           >
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white shadow-sm">
-              <KeyIcon className="w-4 h-4" />
+              <QuestKeyIcon className="w-4 h-4" />
             </div>
-            YieldKey
+            QuestKey
           </button>
 
+          {/* Desktop links */}
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-            <button onClick={() => scrollTo("how-it-works")} className="hover:text-foreground transition-colors">How it works</button>
-            <button onClick={() => scrollTo("features")} className="hover:text-foreground transition-colors">Features</button>
-            <button onClick={() => scrollTo("team")} className="hover:text-foreground transition-colors">AI Team</button>
+            {navLinks.map(link => (
+              <button key={link.id} onClick={() => scrollTo(link.id)} className="hover:text-foreground transition-colors">
+                {link.label}
+              </button>
+            ))}
           </div>
 
-          <button
-            onClick={() => scrollTo("cta")}
-            className="hidden sm:inline-flex px-5 py-2.5 rounded-full bg-primary hover:bg-primary/90 text-white text-sm font-semibold transition-all hover:scale-105 active:scale-95 shadow-sm"
-          >
-            Get Early Access
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => scrollTo("cta")}
+              className="hidden sm:inline-flex px-5 py-2.5 rounded-full bg-primary hover:bg-primary/90 text-white text-sm font-semibold transition-all hover:scale-105 active:scale-95 shadow-sm"
+            >
+              Get Early Access
+            </button>
+
+            {/* Hamburger — mobile only */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile dropdown menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden overflow-hidden bg-white border-t border-border shadow-lg"
+            >
+              <div className="px-5 py-3 flex flex-col gap-1">
+                {navLinks.map(link => (
+                  <button
+                    key={link.id}
+                    onClick={() => scrollTo(link.id)}
+                    className="w-full text-left py-3 text-sm font-medium text-foreground border-b border-border last:border-0 hover:text-primary transition-colors"
+                  >
+                    {link.label}
+                  </button>
+                ))}
+                <button
+                  onClick={() => scrollTo("hero-form")}
+                  className="mt-2 w-full py-3 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors"
+                >
+                  Get Early Access →
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* ── 1. HERO ── */}
@@ -180,8 +262,8 @@ export default function Home() {
             {/* Beta pill */}
             <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/25 text-xs font-semibold text-primary mb-5">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary animate-dot-pulse"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary animate-dot-pulse" />
               </span>
               Private Beta Now Open
             </motion.div>
@@ -191,12 +273,54 @@ export default function Home() {
               Underwrite <span className="text-gradient-primary">smarter</span> rental deals
             </motion.h1>
 
-            {/* Subheadline — specific + punchy */}
+            {/* Subheadline */}
             <motion.p variants={fadeUp} className="text-base sm:text-lg text-muted-foreground mb-7 leading-relaxed">
               Paste any address. In 90 seconds, see projected cash flow for Airbnb, mid-term, and long-term rentals — plus risk flags, regulation checks, and a clear buy-or-pass signal. Powered by 6 AI agents working simultaneously.
             </motion.p>
 
-            {/* Signup form — email + dropdown only, no first name */}
+            {/* Property / market address input */}
+            <motion.div variants={fadeUp} className="mb-4">
+              <div className="flex items-center bg-white rounded-2xl border border-border shadow-md overflow-hidden focus-within:ring-2 focus-within:ring-primary/40 focus-within:border-primary transition-all">
+                <div className="pl-4 pr-2 text-muted-foreground flex-shrink-0">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <input
+                  type="text"
+                  value={addressInput}
+                  onChange={(e) => { setAddressInput(e.target.value); setAddressSubmitted(false); }}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddressSearch()}
+                  placeholder="Enter an address or market (e.g. Austin TX, 1248 Oakwood Ave)"
+                  className="flex-1 py-3.5 pr-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none bg-transparent min-w-0"
+                />
+                <button
+                  onClick={handleAddressSearch}
+                  className="m-1.5 px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors flex-shrink-0 whitespace-nowrap"
+                >
+                  Preview →
+                </button>
+              </div>
+              <AnimatePresence>
+                {addressSubmitted && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="text-xs text-primary font-medium mt-2"
+                  >
+                    Live analysis coming soon — see a sample preview below ↓
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Divider */}
+            <motion.div variants={fadeUp} className="flex items-center gap-3 mb-4">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-xs text-muted-foreground">or join the waitlist for early access</span>
+              <div className="flex-1 h-px bg-border" />
+            </motion.div>
+
+            {/* Waitlist form — email + dropdown, no first name */}
             <motion.div variants={fadeUp} id="hero-form" className="bg-white border border-border shadow-md rounded-2xl p-5 sm:p-6 text-left">
               <WaitlistForm hideFirstName />
             </motion.div>
@@ -211,7 +335,7 @@ export default function Home() {
       </section>
 
       {/* ── 2. PROPERTY ANALYSIS DEMO ── */}
-      <section className="py-14 lg:py-20 px-5 bg-[#F8F9FA]">
+      <section id="demo" className="py-14 lg:py-20 px-5 bg-[#F8F9FA]">
         <div className="max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -223,17 +347,15 @@ export default function Home() {
             <p className="text-[11px] font-bold text-primary uppercase tracking-[0.15em] mb-2">Live deal analysis</p>
             <h2 className="text-2xl sm:text-3xl font-display font-bold text-foreground">See it in action</h2>
             <p className="text-muted-foreground mt-2 text-sm max-w-md mx-auto">
-              A real analysis on a real Austin, TX property — showing what YieldKey surfaces before you make an offer.
+              A real analysis on a real Austin, TX property — showing what QuestKey surfaces before you make an offer.
             </p>
-            <p className="text-xs text-muted-foreground/70 mt-1">
-              Analyzing data from 200+ markets across the US
-            </p>
+            <p className="text-xs text-muted-foreground/70 mt-1">Analyzing data from 200+ markets across the US</p>
           </motion.div>
           <MockDashboard />
         </div>
       </section>
 
-      {/* ── 3. AI AGENT TEAM — DEAL ROOM ── */}
+      {/* ── 3. AI AGENT TEAM ── */}
       <section id="team" className="py-18 lg:py-24 bg-white border-y border-border px-5">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -251,7 +373,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {/* ── Mobile: accordion ── */}
+          {/* Mobile: accordion */}
           <div className="block md:hidden flex flex-col gap-3 mb-4">
             {agents.map((agent, i) => (
               <div key={agent.name} className={`rounded-2xl border ${agent.border} ${agent.bg} overflow-hidden`}>
@@ -278,11 +400,9 @@ export default function Home() {
                       className="overflow-hidden"
                     >
                       <div className="px-4 pb-4">
-                        <div className="bg-white/80 border-l-4 border-l-current rounded-r-xl pl-4 pr-3 py-3" style={{ borderLeftColor: "rgba(0,0,0,0.15)" }}>
+                        <div className="bg-white/80 border-l-4 border-border rounded-r-xl pl-4 pr-3 py-3">
                           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Agent Output</p>
-                          <p className="text-sm text-foreground/85 leading-[1.6] whitespace-pre-line">
-                            {agent.output}
-                          </p>
+                          <p className="text-sm text-foreground/85 leading-[1.6] whitespace-pre-line">{agent.output}</p>
                         </div>
                       </div>
                     </motion.div>
@@ -290,19 +410,18 @@ export default function Home() {
                 </AnimatePresence>
               </div>
             ))}
-            {/* Dot indicator */}
             <div className="flex justify-center gap-1.5 pt-2">
               {agents.map((_, i) => (
                 <div
                   key={i}
-                  className={`w-2 h-2 rounded-full transition-colors cursor-pointer ${expandedAgent === i ? "bg-primary" : "bg-border"}`}
                   onClick={() => setExpandedAgent(i)}
+                  className={`w-2 h-2 rounded-full cursor-pointer transition-colors ${expandedAgent === i ? "bg-primary" : "bg-border"}`}
                 />
               ))}
             </div>
           </div>
 
-          {/* ── Desktop: 2×3 grid ── */}
+          {/* Desktop: 2×3 grid */}
           <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {agents.map((agent, i) => (
               <motion.div
@@ -336,7 +455,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── MID-PAGE CTA BREAK ── */}
+      {/* ── MID-PAGE CTA ── */}
       <section className="py-10 px-5 bg-[#FFF5F5] border-y border-primary/10">
         <div className="max-w-xl mx-auto text-center">
           <motion.div
@@ -354,7 +473,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 4. FEATURES — BENTO GRID ── */}
+      {/* ── 4. FEATURES ── */}
       <section id="features" className="py-18 lg:py-24 px-5 bg-[#F8F9FA]">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -364,13 +483,13 @@ export default function Home() {
             transition={{ duration: 0.45 }}
             className="mb-12"
           >
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">What YieldKey does</h2>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">What QuestKey does</h2>
             <p className="text-muted-foreground text-base max-w-xl">Everything you need to underwrite with confidence, in one seamless workflow.</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 auto-rows-[minmax(160px,auto)]">
 
-            {/* Feature 1 — Compare (large, 4 cols) */}
+            {/* Feature 1 — Compare */}
             <motion.div
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0, duration: 0.45 }}
               className="lg:col-span-4 bg-white border border-border rounded-2xl p-6 hover:shadow-md transition-all group relative overflow-hidden"
@@ -380,7 +499,6 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">Compare STR / MTR / LTR side by side</h3>
               <p className="text-muted-foreground text-sm leading-relaxed max-w-md mb-4">Stop guessing. See exactly how a property performs across every rental strategy on one screen — cash flow, cap rate, occupancy, and risk, all at once.</p>
-              {/* Inline bar chart */}
               <div className="space-y-2 max-w-xs">
                 {[
                   { label: "STR", pct: 100, color: "bg-primary" },
@@ -398,7 +516,7 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Feature 2 — Regulation Risk (tall, 2 cols, 2 rows) */}
+            {/* Feature 2 — Regulation Risk (tall, 2 rows) */}
             <motion.div
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.08, duration: 0.45 }}
               className="lg:col-span-2 lg:row-span-2 bg-white border border-border rounded-2xl p-6 hover:shadow-md transition-all group relative overflow-hidden"
@@ -409,7 +527,7 @@ export default function Home() {
               <h3 className="text-xl font-bold text-foreground mb-2">Surface market & regulation risk</h3>
               <p className="text-muted-foreground text-sm leading-relaxed mb-4">We scan local ordinances so you don't buy an Airbnb in a city that just banned short-term rentals.</p>
               <div className="space-y-2">
-                {["STR permit required", "HOA rental restrictions", "90-day rule active", "Market saturation flag"].map((risk) => (
+                {["STR permit required", "HOA rental restrictions", "90-day rule active", "Market saturation flag"].map(risk => (
                   <div key={risk} className="flex items-center gap-2 text-xs bg-rose-50 border border-rose-100 rounded-lg px-3 py-2 text-rose-700 font-medium">
                     <span className="w-1.5 h-1.5 rounded-full bg-rose-400 flex-shrink-0" />{risk}
                   </div>
@@ -448,9 +566,6 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.45 }}
               className="lg:col-span-3 bg-white border border-border rounded-2xl p-6 hover:shadow-md transition-all group relative overflow-hidden"
             >
-              <div className="absolute right-0 bottom-0 opacity-[0.04] pointer-events-none">
-                <svg width="140" height="80" viewBox="0 0 140 80"><path d="M10 70 L50 20 L90 50 L130 10" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round"/></svg>
-              </div>
               <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-4 group-hover:scale-105 transition-transform">
                 <Building2 className="w-5 h-5" />
               </div>
@@ -458,7 +573,7 @@ export default function Home() {
               <p className="text-muted-foreground text-sm leading-relaxed">Never rely on a single strategy. Know your downside protection before you close the deal.</p>
             </motion.div>
 
-            {/* Feature 6 — Save & Review */}
+            {/* Feature 6 — Save */}
             <motion.div
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.24, duration: 0.45 }}
               className="lg:col-span-3 bg-white border border-border rounded-2xl p-6 hover:shadow-md transition-all group relative overflow-hidden"
@@ -511,13 +626,12 @@ export default function Home() {
                 </motion.div>
               );
               if (i < steps.length - 1) {
-                return [
-                  stepEl,
+                return [stepEl, (
                   <div key={`conn-m-${i}`} className="flex flex-col items-center py-1">
                     <div className="border-l-2 border-dashed border-primary/30 h-7" />
                     <ChevronDown className="w-5 h-5 text-primary/50 -mt-1" />
                   </div>
-                ];
+                )];
               }
               return [stepEl];
             })}
@@ -543,12 +657,11 @@ export default function Home() {
                 </motion.div>
               );
               if (i < steps.length - 1) {
-                return [
-                  stepEl,
+                return [stepEl, (
                   <div key={`conn-d-${i}`} className="flex-shrink-0 flex items-center mt-7">
                     <ChevronRight className="w-6 h-6 text-primary/40" />
                   </div>
-                ];
+                )];
               }
               return [stepEl];
             })}
@@ -556,7 +669,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 6. WHO USES YIELDKEY ── */}
+      {/* ── 6. WHO USES QUESTKEY ── */}
       <section className="py-18 lg:py-24 px-5 bg-[#F8F9FA]">
         <div className="max-w-5xl mx-auto">
           <motion.div
@@ -566,9 +679,9 @@ export default function Home() {
             transition={{ duration: 0.45 }}
             className="text-center mb-10"
           >
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-3">Who uses YieldKey?</h2>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-3">Who uses QuestKey?</h2>
             <p className="text-muted-foreground text-sm max-w-xl mx-auto leading-relaxed">
-              Whether you're buying your first rental or scaling to ten, YieldKey meets you where you are.
+              Whether you're buying your first rental or scaling to ten, QuestKey meets you where you are.
             </p>
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -595,7 +708,7 @@ export default function Home() {
         <div className="max-w-3xl mx-auto text-center relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
             <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-display font-bold text-white mb-4">
-              Be first to try YieldKey
+              Be first to try QuestKey
             </motion.h2>
             <motion.p variants={fadeUp} className="text-lg text-white/85 mb-10 max-w-xl mx-auto leading-relaxed">
               1,000 founding member spots. 847 claimed. Get in before they're gone.
@@ -612,17 +725,17 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2 font-display font-bold text-lg text-foreground">
             <div className="w-6 h-6 rounded bg-primary flex items-center justify-center text-white">
-              <KeyIcon className="w-3 h-3" />
+              <QuestKeyIcon className="w-3 h-3" />
             </div>
-            YieldKey
+            QuestKey
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 text-sm text-muted-foreground text-center">
-            <span>YieldKey © 2026 · Built by Castle Capital</span>
+            <span>QuestKey © 2026 · Built by Castle Capital</span>
             <span className="hidden sm:inline text-border">·</span>
-            <a href="#" className="hover:text-foreground transition-colors text-muted-foreground underline-offset-2 hover:underline">Privacy Policy</a>
+            <a href="#" className="hover:text-foreground transition-colors underline-offset-2 hover:underline">Privacy Policy</a>
             <span className="hidden sm:inline text-border">·</span>
-            <a href="mailto:team@yieldkey.com" className="hover:text-foreground transition-colors text-muted-foreground">team@yieldkey.com</a>
+            <a href="mailto:team@questkey.com" className="hover:text-foreground transition-colors">team@questkey.com</a>
           </div>
 
           <div className="flex gap-3">
@@ -638,20 +751,5 @@ export default function Home() {
         </div>
       </footer>
     </div>
-  );
-}
-
-function KeyIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24" height="24" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-      {...props}
-    >
-      <circle cx="7.5" cy="15.5" r="5.5"/>
-      <path d="m21 2-9.6 9.6"/>
-      <path d="m15.5 7.5 3 3L22 7l-3-3"/>
-    </svg>
   );
 }
