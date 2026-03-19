@@ -29,10 +29,10 @@ function QuestKeyIcon(props: React.SVGProps<SVGSVGElement>) {
       strokeLinejoin="round"
       {...props}
     >
-      {/* Q ring */}
-      <circle cx="9.5" cy="9.5" r="6.5" stroke="currentColor" strokeWidth="2.2" />
-      {/* Key stem — diagonal bottom-right at 45° */}
-      <line x1="14.1" y1="14.1" x2="21" y2="21" stroke="currentColor" strokeWidth="2.2" />
+      {/* Q ring — larger */}
+      <circle cx="9" cy="9" r="8" stroke="currentColor" strokeWidth="2.2" />
+      {/* Key stem — diagonal bottom-right at 45°, starts at circle edge */}
+      <line x1="14.7" y1="14.7" x2="21" y2="21" stroke="currentColor" strokeWidth="2.2" />
       {/* Key bit — T-crossbar perpendicular to stem at the tip */}
       <line x1="19.5" y1="22.5" x2="22.5" y2="19.5" stroke="currentColor" strokeWidth="2" />
       {/* Second shorter tooth partway along the stem */}
