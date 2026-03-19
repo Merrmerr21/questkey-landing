@@ -143,6 +143,7 @@ export default function Home() {
       confidence: 87,
       sources: "Based on: Zillow market trends, Census data, Redfin demand index",
       isRhea: false,
+      isAvery: true,
       content: (
         <span>
           Austin's 78745 submarket shows <strong className="text-foreground">demand exceeding supply</strong> for STR inventory. Median price appreciation of{" "}
@@ -191,6 +192,7 @@ export default function Home() {
       confidence: 83,
       sources: "Based on: AirDNA revenue data, dynamic pricing benchmarks, seasonal demand models",
       isRhea: false,
+      isRex: true,
       content: (
         <span>
           Projected ADR of <span className="font-semibold text-primary">$245/night</span> based on 42 comparable active listings. Peak season (Mar–May, Sep–Nov) occupancy reaches{" "}
@@ -522,6 +524,30 @@ export default function Home() {
                         <p className="text-[11px] text-muted-foreground/50 mt-1">{agent.sources}</p>
                       </div>
                     </motion.div>
+
+                    {/* Rhea reacts to Avery */}
+                    {agent.isAvery && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2, duration: 0.38 }}
+                        className="mx-4 mb-4 bg-rose-50 border border-rose-200 rounded-xl px-4 py-3 flex gap-3"
+                      >
+                        <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white">
+                          <ShieldAlert className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                            <span className="text-xs font-bold text-rose-700">Rhea — Live Update</span>
+                            <span className="text-[10px] bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded font-semibold">REACTED TO AVERY</span>
+                          </div>
+                          <p className="text-xs text-rose-700/90 leading-relaxed">
+                            Cross-referenced Avery's demand data against city permit records. STR backlog in 78745 is <strong>34% above citywide average</strong> due to high demand. Revising permit wait to <strong>55 days</strong> and flagging HOA review as priority item.
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
 
                     {/* Uri reacts to Rhea */}
                     {agent.isRhea && (
