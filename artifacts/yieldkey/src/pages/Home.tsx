@@ -13,6 +13,12 @@ import {
   MapPin,
   Menu,
   X,
+  Clock,
+  Calculator,
+  Target,
+  Wrench,
+  TrendingUp,
+  PieChart,
 } from "lucide-react";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { MockDashboard } from "@/components/MockDashboard";
@@ -89,7 +95,6 @@ const staggerContainer = {
 
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
-  const [expandedAgent, setExpandedAgent] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [addressInput, setAddressInput] = useState("");
   const [addressSubmitted, setAddressSubmitted] = useState(false);
@@ -113,35 +118,103 @@ export default function Home() {
 
   const agents = [
     {
-      name: "Uri", role: "Underwriting", initials: "U",
-      color: "from-blue-500 to-indigo-600", border: "border-blue-200", bg: "bg-blue-50/60",
-      output: `Cash-on-cash: 14.2% (STR) vs 6.8% (MTR) vs 2.1% (LTR)\nSTR breakeven occupancy: 52%\nIRR at 5-yr exit: 18.4%`
+      name: "Uri",
+      role: "Underwriting",
+      Icon: Calculator,
+      color: "from-blue-500 to-indigo-600",
+      confidence: 94,
+      sources: "Based on: MLS comps, county tax records, AirDNA occupancy data",
+      isRhea: false,
+      content: (
+        <span>
+          Cash-on-cash return is <strong className="text-foreground">14.2%</strong> on the STR path versus{" "}
+          <strong className="text-foreground">6.8%</strong> mid-term and{" "}
+          <strong className="text-foreground">2.1%</strong> long-term. Breakeven occupancy is{" "}
+          <span className="font-semibold text-primary">52%</span> — well below the market average of 68%. 5-year levered IRR projects to{" "}
+          <span className="font-semibold text-primary">18.4%</span> assuming a conservative exit cap rate of 6.2%.
+        </span>
+      ),
     },
     {
-      name: "Avery", role: "Acquisitions", initials: "A",
-      color: "from-purple-500 to-fuchsia-600", border: "border-purple-200", bg: "bg-purple-50/60",
-      output: `Austin 78745 is a strong Airbnb submarket.\nMedian price up 3.2% YoY, rental demand\noutpacing supply. Acquisition score: 8.1/10.`
+      name: "Avery",
+      role: "Acquisitions",
+      Icon: Target,
+      color: "from-purple-500 to-fuchsia-600",
+      confidence: 87,
+      sources: "Based on: Zillow market trends, Census data, Redfin demand index",
+      isRhea: false,
+      content: (
+        <span>
+          Austin's 78745 submarket shows <strong className="text-foreground">demand exceeding supply</strong> for STR inventory. Median price appreciation of{" "}
+          <span className="font-semibold text-primary">+3.2% YoY</span> with strong absorption. Acquisition score:{" "}
+          <span className="font-semibold text-primary">8.1/10</span> based on competition levels, entry pricing, and demand trajectory.
+        </span>
+      ),
     },
     {
-      name: "Rhea", role: "Risk", initials: "R",
-      color: "from-rose-500 to-orange-500", border: "border-rose-200", bg: "bg-rose-50/60",
-      output: `⚠ Austin requires active STR permit.\nCurrent owner has none — factor 45–60 day\napproval. HOA may restrict stays < 30 days.`
+      name: "Rhea",
+      role: "Risk",
+      Icon: ShieldAlert,
+      color: "from-rose-500 to-orange-500",
+      confidence: 91,
+      sources: "Based on: City of Austin STR ordinance database, HOA filings, permit records",
+      isRhea: true,
+      content: (
+        <span>
+          <strong className="text-foreground">STR permit required</strong> — current owner has none. Permit approval window is{" "}
+          <span className="font-semibold text-rose-600">45–60 days</span>, delaying income by 1.5–2 months. HOA filings flag potential restriction on stays under 30 days. Overall risk level:{" "}
+          <span className="font-semibold text-amber-600">moderate</span>.
+        </span>
+      ),
     },
     {
-      name: "Sloane", role: "Setup", initials: "S",
-      color: "from-amber-400 to-yellow-500", border: "border-amber-200", bg: "bg-amber-50/60",
-      output: `Furnishing budget: $12,400 for a competitive\n3BR listing. Recommend keyless entry +\nsmart thermostat for remote management.`
+      name: "Sloane",
+      role: "Setup",
+      Icon: Wrench,
+      color: "from-amber-400 to-yellow-500",
+      confidence: 88,
+      sources: "Based on: Airbnb listing benchmarks, Amazon furnishing index, local contractor rates",
+      isRhea: false,
+      content: (
+        <span>
+          Competitive 3BR listing requires approximately{" "}
+          <span className="font-semibold text-primary">$12,400 in furnishing</span>. Priority items: keyless entry, smart thermostat, mid-range staging. Local contractor rates are favorable. Estimated turnover cleaning cost:{" "}
+          <strong className="text-foreground">$280/turn</strong>.
+        </span>
+      ),
     },
     {
-      name: "Rex", role: "Revenue", initials: "R",
-      color: "from-[#FF5A5F] to-rose-400", border: "border-rose-200", bg: "bg-rose-50/60",
-      output: `Projected ADR: $245/night. Peak season\n(Mar–May, Sep–Nov) occupancy 78%.\nDynamic pricing could boost revenue 12–18%.`
+      name: "Rex",
+      role: "Revenue",
+      Icon: TrendingUp,
+      color: "from-[#FF5A5F] to-rose-400",
+      confidence: 83,
+      sources: "Based on: AirDNA revenue data, dynamic pricing benchmarks, seasonal demand models",
+      isRhea: false,
+      content: (
+        <span>
+          Projected ADR of <span className="font-semibold text-primary">$245/night</span> based on 42 comparable active listings. Peak season (Mar–May, Sep–Nov) occupancy reaches{" "}
+          <strong className="text-foreground">78%</strong>. Dynamic pricing implementation historically boosts annual revenue by{" "}
+          <span className="font-semibold text-primary">12–18%</span> in this submarket.
+        </span>
+      ),
     },
     {
-      name: "Pax", role: "Portfolio", initials: "P",
-      color: "from-cyan-500 to-blue-500", border: "border-cyan-200", bg: "bg-cyan-50/60",
-      output: `Adding this STR brings your STR exposure\nto 60%. Consider your next acquisition as\nan MTR to balance risk across the portfolio.`
-    }
+      name: "Pax",
+      role: "Portfolio",
+      Icon: PieChart,
+      color: "from-cyan-500 to-blue-500",
+      confidence: 92,
+      sources: "Based on: Portfolio allocation models, risk-adjusted return metrics, market correlation data",
+      isRhea: false,
+      content: (
+        <span>
+          Adding this STR brings total STR concentration to{" "}
+          <span className="font-semibold text-amber-600">60% of portfolio</span>. Recommend next acquisition be MTR or LTR to balance exposure. Current portfolio expected Sharpe ratio:{" "}
+          <strong className="text-foreground">0.94</strong> — remains in acceptable range.
+        </span>
+      ),
+    },
   ];
 
   const steps = [
@@ -377,103 +450,172 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 3. AI AGENT TEAM ── */}
-      <section id="team" className="py-18 lg:py-24 bg-white border-y border-border px-5">
-        <div className="max-w-7xl mx-auto">
+      {/* ── 3. AI AGENT TEAM — DEAL ROOM ── */}
+      <section id="team" className="py-18 lg:py-24 bg-[#F8F9FA] border-y border-border px-5">
+        <div className="max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.45 }}
-            className="text-center mb-12"
+            className="text-center mb-10"
           >
             <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-3">
               Six AI analysts. One complete picture.
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto text-base">
-              Every deal gets torn apart from six angles before you see a single number.
+            <p className="text-muted-foreground max-w-xl mx-auto text-base">
+              Watch them work a real deal from six angles — simultaneously, reacting to each other's findings.
             </p>
           </motion.div>
 
-          {/* Mobile: accordion */}
-          <div className="block md:hidden flex flex-col gap-3 mb-4">
-            {agents.map((agent, i) => (
-              <div key={agent.name} className={`rounded-2xl border ${agent.border} ${agent.bg} overflow-hidden`}>
-                <button
-                  className="w-full flex items-center gap-3 p-4 text-left"
-                  onClick={() => setExpandedAgent(expandedAgent === i ? -1 : i)}
-                >
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-display font-bold text-lg text-white bg-gradient-to-br ${agent.color} flex-shrink-0`}>
-                    {agent.initials}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-base text-foreground leading-tight">{agent.name}</h3>
-                    <span className="text-xs uppercase tracking-widest font-bold text-muted-foreground">{agent.role}</span>
-                  </div>
-                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${expandedAgent === i ? "rotate-180" : ""}`} />
-                </button>
-                <AnimatePresence initial={false}>
-                  {expandedAgent === i && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.22 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-4 pb-4">
-                        <div className="bg-white/80 border-l-4 border-border rounded-r-xl pl-4 pr-3 py-3">
-                          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Agent Output</p>
-                          <p className="text-sm text-foreground/85 leading-[1.6] whitespace-pre-line">{agent.output}</p>
+          {/* Deal Room Panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="bg-white rounded-2xl shadow-xl border border-border overflow-hidden"
+          >
+            {/* Panel header bar */}
+            <div className="bg-gray-900 px-5 py-3.5 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0 animate-pulse" />
+                <span className="text-white font-semibold text-sm flex-shrink-0">Deal Room</span>
+                <span className="text-gray-500 text-sm truncate hidden sm:block">· 1248 Oakwood Ave, Austin TX</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-gray-400 text-xs flex-shrink-0">
+                <Clock className="w-3.5 h-3.5" />
+                <span>Analysis completed in 47s</span>
+              </div>
+            </div>
+
+            {/* Agent feed */}
+            <div className="divide-y divide-border">
+              {agents.map((agent, i) => (
+                <div key={agent.name}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ delay: i * 0.07, duration: 0.4 }}
+                    className="px-5 py-5 flex gap-4"
+                  >
+                    {/* Functional icon avatar */}
+                    <div className={`flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white shadow-sm`}>
+                      <agent.Icon className="w-5 h-5" />
+                    </div>
+
+                    {/* Message content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <span className="font-semibold text-sm text-foreground">{agent.name}</span>
+                        <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                          {agent.role}
+                        </span>
+                      </div>
+                      <p className="text-sm text-foreground/80 leading-relaxed">{agent.content}</p>
+
+                      {/* Confidence bar */}
+                      <div className="flex items-center gap-2 mt-3">
+                        <span className="text-[11px] text-muted-foreground">Confidence</span>
+                        <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-1.5 bg-green-500 rounded-full"
+                            style={{ width: `${agent.confidence}%` }}
+                          />
                         </div>
+                        <span className="text-[11px] font-semibold text-green-600">{agent.confidence}%</span>
+                      </div>
+
+                      {/* Sources */}
+                      <p className="text-[11px] text-muted-foreground/55 mt-1.5">{agent.sources}</p>
+                    </div>
+                  </motion.div>
+
+                  {/* Inter-agent callout: Uri reacts to Rhea's findings */}
+                  {agent.isRhea && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 12 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.2, duration: 0.4 }}
+                      className="mx-5 mb-5 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex gap-3"
+                    >
+                      <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white">
+                        <Calculator className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="text-xs font-bold text-blue-700">Uri — Live Update</span>
+                          <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-semibold">
+                            REACTED TO RHEA
+                          </span>
+                        </div>
+                        <p className="text-xs text-blue-700/90 leading-relaxed">
+                          Adjusted STR cash flow to account for 45–60 day permit delay. Net impact:{" "}
+                          <strong>-$920 in months 1–2</strong>, breakeven by month 4. Revised IRR:{" "}
+                          <strong>17.8%</strong> (was 18.4%). Recommendation unchanged — STR still strongly favored.
+                        </p>
                       </div>
                     </motion.div>
                   )}
-                </AnimatePresence>
-              </div>
-            ))}
-            <div className="flex justify-center gap-1.5 pt-2">
-              {agents.map((_, i) => (
-                <div
-                  key={i}
-                  onClick={() => setExpandedAgent(i)}
-                  className={`w-2 h-2 rounded-full cursor-pointer transition-colors ${expandedAgent === i ? "bg-primary" : "bg-border"}`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Desktop: 2×3 grid */}
-          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {agents.map((agent, i) => (
-              <motion.div
-                key={agent.name}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ delay: i * 0.08, duration: 0.45 }}
-                className={`group rounded-2xl border ${agent.border} ${agent.bg} p-5 hover:shadow-md transition-all duration-300 flex flex-col gap-4`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-display font-bold text-xl text-white bg-gradient-to-br ${agent.color} shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform`}>
-                    {agent.initials}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-base text-foreground leading-tight">{agent.name}</h3>
-                    <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-white/80 border border-white text-muted-foreground">
-                      {agent.role}
-                    </span>
-                  </div>
                 </div>
-                <div className="bg-white/70 border border-white/80 rounded-xl p-3.5 flex-1">
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Agent Output</p>
-                  <pre className="text-xs text-foreground/80 font-mono leading-relaxed whitespace-pre-wrap break-words">
-                    {agent.output}
-                  </pre>
+              ))}
+
+              {/* Deal Verdict card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1, duration: 0.5 }}
+                className="m-4"
+              >
+                <div className="bg-gray-900 rounded-2xl p-5">
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Deal Verdict</span>
+                    <span className="text-[10px] bg-primary/25 text-primary px-2 py-0.5 rounded font-bold">6/6 Agents</span>
+                    <span className="ml-auto text-[11px] text-gray-500">Confidence: 89%</span>
+                  </div>
+                  <div className="flex items-baseline gap-2 mb-4 flex-wrap">
+                    <span className="text-2xl font-display font-black text-white">BUY</span>
+                    <span className="text-base text-primary font-semibold">— STR Strategy Recommended</span>
+                  </div>
+                  <div className="space-y-1.5 text-sm text-gray-300 mb-4">
+                    <p>✓ Strong cash flow with manageable regulatory risk</p>
+                    <p>✓ Portfolio impact: moderate STR concentration increase</p>
+                    <p>✓ Downside protected: MTR at +$920/mo if STR underperforms</p>
+                  </div>
+                  <div className="pt-4 border-t border-gray-700/60">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">Recommended Actions</p>
+                    <div className="space-y-1.5 text-sm text-gray-200">
+                      <p>→ Apply for STR permit immediately (45–60 day wait)</p>
+                      <p>→ Budget $12,400 for furnishing and setup</p>
+                      <p>→ Implement dynamic pricing from day one</p>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
-            ))}
-          </div>
+            </div>
+          </motion.div>
+
+          {/* Section bottom CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1, duration: 0.45 }}
+            className="text-center mt-10"
+          >
+            <p className="text-xl font-display font-bold text-foreground mb-4">
+              Put six AI analysts on your next deal
+            </p>
+            <button
+              onClick={() => scrollTo("hero-form")}
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-white rounded-full font-semibold hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 shadow-sm"
+            >
+              Get Early Access →
+            </button>
+          </motion.div>
         </div>
       </section>
 
