@@ -375,9 +375,6 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0, duration: 0.45 }}
               className="lg:col-span-4 bg-white border border-border rounded-2xl p-6 hover:shadow-md transition-all group relative overflow-hidden"
             >
-              <div className="absolute right-0 bottom-0 opacity-[0.04] pointer-events-none">
-                <svg width="220" height="120" viewBox="0 0 220 120"><rect x="10" y="60" width="24" height="60" fill="currentColor"/><rect x="44" y="30" width="24" height="90" fill="currentColor"/><rect x="78" y="10" width="24" height="110" fill="currentColor"/><rect x="112" y="40" width="24" height="80" fill="currentColor"/><rect x="146" y="20" width="24" height="100" fill="currentColor"/><rect x="180" y="50" width="24" height="70" fill="currentColor"/></svg>
-              </div>
               <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-4 group-hover:scale-105 transition-transform">
                 <ArrowRightLeft className="w-5 h-5" />
               </div>
@@ -427,7 +424,6 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.12, duration: 0.45 }}
               className="lg:col-span-2 bg-white border border-border rounded-2xl p-6 hover:shadow-md transition-all group relative overflow-hidden"
             >
-              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "repeating-linear-gradient(0deg,transparent,transparent 22px,currentColor 22px,currentColor 23px)" }} />
               <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-4 group-hover:scale-105 transition-transform">
                 <BarChart3 className="w-5 h-5" />
               </div>
