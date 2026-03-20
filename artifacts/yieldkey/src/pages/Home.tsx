@@ -96,6 +96,7 @@ const staggerContainer = {
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [addressInput, setAddressInput] = useState("");
   const [addressSubmitted, setAddressSubmitted] = useState(false);
 
@@ -217,6 +218,24 @@ export default function Home() {
         </span>
       ),
     },
+  ];
+
+  const comparisons = [
+    { without: "Hours in spreadsheets estimating cash flow", with: "Full STR, MTR, and LTR projections in 90 seconds" },
+    { without: "Manually googling local STR regulations", with: "Regulation risk flags pulled automatically from 847 local ordinance databases" },
+    { without: "Guessing occupancy rates from Airbnb listings", with: "Occupancy and ADR projections based on AirDNA comps and seasonal demand data" },
+    { without: "No idea if the deal fits your portfolio", with: "Portfolio-level concentration and risk analysis on every deal" },
+    { without: "One strategy analyzed at a time", with: "Three strategies compared side by side with a clear recommendation" },
+    { without: "No fallback plan if your strategy underperforms", with: "Automatic fallback strategy with projected cash flow if conditions change" },
+  ];
+
+  const faqs = [
+    { q: "Is QuestKey free?", a: "Yes, beta access is completely free. No credit card required. Early users who sign up during beta will lock in founding member pricing when we launch paid plans." },
+    { q: "What data sources power the analysis?", a: "QuestKey pulls from MLS comps, county tax records, AirDNA occupancy and revenue data, Zillow and Redfin market trends, Census data, local STR ordinance databases, and HOA filing records. Every agent output shows its data sources so you can verify the analysis." },
+    { q: "How accurate are the cash flow projections?", a: "Our projections are based on real comparable data from active listings and recent transactions in your target market. Every analysis includes a confidence score so you know how reliable each estimate is. We recommend using QuestKey as a starting point for underwriting, not as a replacement for your own due diligence." },
+    { q: "Do you cover my market?", a: "QuestKey currently analyzes data from over 200 markets across the US. We are expanding coverage every week. If your market is not yet supported, sign up for beta access and we will notify you as soon as it is available." },
+    { q: "What happens after I sign up?", a: "You will receive one email when your beta access is ready. No spam, no drip campaigns. Once you are in, you can start analyzing properties and markets immediately." },
+    { q: "Can I share my analysis with my partner or lender?", a: "Yes. Every deal analysis can be exported to PDF or shared via link. This makes it easy to send to business partners, lenders, or property managers." },
   ];
 
   const steps = [
@@ -382,9 +401,9 @@ export default function Home() {
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
-                    className="text-xs text-primary font-medium mt-2"
+                    className="text-xs text-green-600 font-medium mt-2"
                   >
-                    Live analysis coming soon — see a sample preview below ↓
+                    ↓ Here's a real example of what your analysis will look like
                   </motion.p>
                 )}
               </AnimatePresence>
@@ -405,6 +424,9 @@ export default function Home() {
             {/* Trust line */}
             <motion.p variants={fadeUp} className="text-xs text-muted-foreground mt-4">
               Built by real estate investors, for real estate investors.
+            </motion.p>
+            <motion.p variants={fadeUp} className="text-xs text-muted-foreground/60 mt-1">
+              Backed by real deal experience — our team has underwritten $50M+ in rental acquisitions.
             </motion.p>
 
           </motion.div>
@@ -579,33 +601,58 @@ export default function Home() {
               {/* Right column: Sloane, Rex, Pax */}
               <div className="divide-y divide-border border-t md:border-t-0 border-border">
                 {agents.slice(3).map((agent, i) => (
-                  <motion.div
-                    key={agent.name}
-                    initial={{ opacity: 0, y: 14 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-40px" }}
-                    transition={{ delay: i * 0.08, duration: 0.38 }}
-                    className="px-5 py-4 flex gap-3.5"
-                  >
-                    <div className={`flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white shadow-sm`}>
-                      <agent.Icon className="w-4 h-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                        <span className="font-semibold text-sm text-foreground">{agent.name}</span>
-                        <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{agent.role}</span>
+                  <div key={agent.name}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 14 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ delay: i * 0.08, duration: 0.38 }}
+                      className="px-5 py-4 flex gap-3.5"
+                    >
+                      <div className={`flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white shadow-sm`}>
+                        <agent.Icon className="w-4 h-4" />
                       </div>
-                      <p className="text-sm text-foreground/80 leading-relaxed">{agent.content}</p>
-                      <div className="flex items-center gap-2 mt-2.5">
-                        <span className="text-[11px] text-muted-foreground">Confidence</span>
-                        <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-1.5 bg-green-500 rounded-full" style={{ width: `${agent.confidence}%` }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                          <span className="font-semibold text-sm text-foreground">{agent.name}</span>
+                          <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{agent.role}</span>
                         </div>
-                        <span className="text-[11px] font-semibold text-green-600">{agent.confidence}%</span>
+                        <p className="text-sm text-foreground/80 leading-relaxed">{agent.content}</p>
+                        <div className="flex items-center gap-2 mt-2.5">
+                          <span className="text-[11px] text-muted-foreground">Confidence</span>
+                          <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-1.5 bg-green-500 rounded-full" style={{ width: `${agent.confidence}%` }} />
+                          </div>
+                          <span className="text-[11px] font-semibold text-green-600">{agent.confidence}%</span>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground/50 mt-1">{agent.sources}</p>
                       </div>
-                      <p className="text-[11px] text-muted-foreground/50 mt-1">{agent.sources}</p>
-                    </div>
-                  </motion.div>
+                    </motion.div>
+
+                    {/* Pax reacts to Rex */}
+                    {agent.isRex && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2, duration: 0.38 }}
+                        className="mx-4 mb-4 bg-cyan-50 border border-cyan-200 rounded-xl px-4 py-3 flex gap-3"
+                      >
+                        <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-white">
+                          <PieChart className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                            <span className="text-xs font-bold text-cyan-700">Pax — Live Update</span>
+                            <span className="text-[10px] bg-cyan-100 text-cyan-600 px-1.5 py-0.5 rounded font-semibold">REACTED TO REX</span>
+                          </div>
+                          <p className="text-xs text-cyan-700/90 leading-relaxed">
+                            Rex's <strong>$245/night ADR</strong> and 78% peak occupancy improve portfolio yield significantly. Revised Sharpe ratio: <strong>1.12</strong> (was 0.94). STR concentration concern partially offset by stronger cash flow quality.
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -649,24 +696,6 @@ export default function Home() {
             </motion.div>
           </motion.div>
 
-          {/* Section bottom CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1, duration: 0.45 }}
-            className="text-center mt-10"
-          >
-            <p className="text-xl font-display font-bold text-foreground mb-4">
-              Put six AI analysts on your next deal
-            </p>
-            <button
-              onClick={() => scrollTo("hero-form")}
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-white rounded-full font-semibold hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 shadow-sm"
-            >
-              Get Early Access →
-            </button>
-          </motion.div>
         </div>
       </section>
 
@@ -807,6 +836,61 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── 4b. COMPARISON — QuestKey vs. the old way ── */}
+      <section className="py-14 lg:py-20 px-5 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.45 }}
+            className="text-center mb-10"
+          >
+            <h2 className="text-2xl sm:text-3xl font-display font-bold text-foreground mb-2">QuestKey vs. the old way</h2>
+            <p className="text-muted-foreground text-sm">One tool replaces hours of manual research.</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1, duration: 0.45 }}
+            className="border border-border rounded-2xl overflow-hidden shadow-sm"
+          >
+            {/* Column headers */}
+            <div className="grid grid-cols-2">
+              <div className="bg-gray-50 px-5 py-3.5 border-b border-border flex items-center gap-2">
+                <span className="text-sm font-bold text-muted-foreground">Without QuestKey</span>
+              </div>
+              <div className="bg-primary/5 px-5 py-3.5 border-b border-l border-border flex items-center gap-2">
+                <span className="text-sm font-bold text-primary">With QuestKey</span>
+              </div>
+            </div>
+
+            {/* Comparison rows */}
+            {comparisons.map((row, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05, duration: 0.35 }}
+                className="grid grid-cols-2 border-b border-border last:border-b-0"
+              >
+                <div className="px-5 py-4 flex gap-2.5 items-start bg-red-50/30 border-r border-border">
+                  <span className="text-red-400 font-bold text-sm flex-shrink-0 leading-5">✗</span>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{row.without}</p>
+                </div>
+                <div className="px-5 py-4 flex gap-2.5 items-start bg-green-50/25">
+                  <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs sm:text-sm text-foreground leading-relaxed">{row.with}</p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
       {/* ── 5. HOW IT WORKS ── */}
       <section id="how-it-works" className="py-18 lg:py-24 bg-white border-y border-border px-5 overflow-hidden">
         <div className="max-w-4xl mx-auto">
@@ -911,6 +995,55 @@ export default function Home() {
               >
                 <h3 className="font-display font-bold text-foreground text-sm mb-1.5">{item.type}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{item.pain}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 6b. FAQ ── */}
+      <section className="py-14 lg:py-20 px-5 bg-white border-t border-border">
+        <div className="max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.45 }}
+            className="text-center mb-10"
+          >
+            <h2 className="text-2xl sm:text-3xl font-display font-bold text-foreground">Common questions</h2>
+          </motion.div>
+
+          <div className="space-y-2">
+            {faqs.map((faq, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05, duration: 0.35 }}
+                className="border border-border rounded-xl overflow-hidden"
+              >
+                <button
+                  onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-muted/40 transition-colors"
+                >
+                  <span className="font-semibold text-sm text-foreground pr-4">{faq.q}</span>
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${expandedFaq === i ? "rotate-180" : ""}`} />
+                </button>
+                <AnimatePresence initial={false}>
+                  {expandedFaq === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.22 }}
+                      className="overflow-hidden"
+                    >
+                      <p className="px-5 pb-4 text-sm text-muted-foreground leading-relaxed border-t border-border pt-3">{faq.a}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             ))}
           </div>

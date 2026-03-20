@@ -1,0 +1,37 @@
+Remove the “Put six AI analysts on your next deal” heading and its Get Early Access button that appears directly above the “Ready to underwrite your first deal?” email form section. These two CTAs are stacked right on top of each other and it looks like the page is begging twice. Keep only the “Ready to underwrite your first deal?” section with the email form. There should always be at least one full content section between any two signup opportunities.
+
+When someone types an address or market into the hero input field and taps the Preview button, smooth scroll them down to the property demo section (the 1248 Oakwood Ave browser mockup). Do not show a dead-end, error, or coming soon message. The scroll should be smooth and land them right at the top of the “See it in action” section so they immediately see what a real analysis looks like. This makes the preview button feel functional and gives visitors an instant payoff for interacting with the hero.
+
+Add a new section called “QuestKey vs. the old way” between the “What QuestKey does” features section and the “Three steps to a better deal” section. This should be a simple two-column comparison layout. Left column header: “Without QuestKey” in gray or muted text. Right column header: “With QuestKey” in coral. List five to six comparison rows:
+
+Without QuestKey: Hours in spreadsheets estimating cash flow. With QuestKey: Full STR, MTR, and LTR projections in 90 seconds.
+
+Without QuestKey: Manually googling local STR regulations. With QuestKey: Regulation risk flags pulled automatically from 847 local ordinance databases.
+
+Without QuestKey: Guessing occupancy rates from Airbnb listings. With QuestKey: Occupancy and ADR projections based on AirDNA comps and seasonal demand data.
+
+Without QuestKey: No idea if the deal fits your portfolio. With QuestKey: Portfolio-level concentration and risk analysis on every deal.
+
+Without QuestKey: One strategy analyzed at a time. With QuestKey: Three strategies compared side by side with a clear recommendation.
+
+Without QuestKey: No fallback plan if your strategy underperforms. With QuestKey: Automatic fallback strategy with projected cash flow if conditions change.
+
+Style the left column rows with a subtle red-tinted background or a small X icon to signal pain. Style the right column rows with a subtle green-tinted background or a small checkmark icon to signal the solution. On mobile stack the two columns vertically with Without on top and With below for each row, or use a simple alternating card layout. Keep it clean and scannable.
+
+Add a FAQ section between the “Who uses QuestKey?” section and the bottom coral CTA section. Header: “Common questions” in a clean bold heading. Use an accordion/collapse layout where each question is visible and tapping it expands the answer. Include these six questions and answers:
+
+Question: Is QuestKey free? Answer: Yes, beta access is completely free. No credit card required. Early users who sign up during beta will lock in founding member pricing when we launch paid plans.
+
+Question: What data sources power the analysis? Answer: QuestKey pulls from MLS comps, county tax records, AirDNA occupancy and revenue data, Zillow and Redfin market trends, Census data, local STR ordinance databases, and HOA filing records. Every agent output shows its data sources so you can verify the analysis.
+
+Question: How accurate are the cash flow projections? Answer: Our projections are based on real comparable data from active listings and recent transactions in your target market. Every analysis includes a confidence score so you know how reliable each estimate is. We recommend using QuestKey as a starting point for underwriting, not as a replacement for your own due diligence.
+
+Question: Do you cover my market? Answer: QuestKey currently analyzes data from over 200 markets across the US. We are expanding coverage every week. If your market is not yet supported, sign up for beta access and we will notify you as soon as it is available.
+
+Question: What happens after I sign up? Answer: You will receive one email when your beta access is ready. No spam, no drip campaigns. Once you are in, you can start analyzing properties and markets immediately.
+
+Question: Can I share my analysis with my partner or lender? Answer: Yes. Every deal analysis can be exported to PDF or shared via link. This makes it easy to send to business partners, lenders, or property managers.
+
+Style the FAQ section on a white or very light gray background. Keep the answers concise. Each answer should be no more than three sentences.
+
+Add one more small trust signal in the hero section. Below the “Built by real estate investors, for real estate investors” line, add “Backed by real deal experience — our team has underwritten $50M+ in rental acquisitions.” This can be approximate but it signals that the founders actually know real estate, not just software. Style it in small gray text, not prominent, just a quiet credibility line.​​​​​​​​​​​​​​​​
