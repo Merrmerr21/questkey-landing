@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuestKey — App</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['IBM Plex Mono', 'monospace'],
+          },
+          colors: {
+            qk: {
+              bg:         '#0B0F1A',
+              surface:    '#141929',
+              's2':       '#1C2237',
+              border:     '#252D44',
+              accent:     '#FF5757',
+              text:       '#E8ECF4',
+              muted:      '#7B8BA8',
+              success:    '#10B981',
+              warning:    '#F59E0B',
+              danger:     '#EF4444',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --qk-bg:      #0B0F1A;
+      --qk-surface: #141929;
+      --qk-s2:      #1C2237;
+      --qk-border:  #252D44;
+      --qk-accent:  #FF5757;
+      --qk-text:    #E8ECF4;
+      --qk-muted:   #7B8BA8;
+      --qk-success: #10B981;
+      --qk-warning: #F59E0B;
+      --qk-danger:  #EF4444;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background: var(--qk-bg);
+      color: var(--qk-text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Wizard step slide transitions ── */
+    .wizard-steps {
+      position: relative;
+      overflow: hidden;
+      min-height: 420px;
+    }
+    .wizard-step {
+      position: absolute;
+      inset: 0;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1),
+                  opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .wizard-step.active {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+      position: relative;
+    }
+    .wizard-step.prev {
+      transform: translateX(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ── Scrollbar styling ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--qk-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--qk-border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     ONBOARDING VIEW
+════════════════════════════════════════════ -->
+<div id="onboarding" class="min-h-screen flex flex-col items-center justify-center px-4 py-12"
+     style="background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(255,87,87,0.08), transparent), var(--qk-bg);">
+
+  <!-- Top logo -->
+  <div class="mb-8 flex items-center gap-2.5">
+    <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background: var(--qk-accent);">
+      <!-- Q-key icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+        <circle cx="10" cy="10" r="8.5" stroke-width="2.2"/>
+        <line x1="16.0" y1="16.0" x2="21" y2="21" stroke-width="2.2"/>
+        <line x1="19.5" y1="22.5" x2="22.5" y2="19.5" stroke-width="2"/>
+        <line x1="17.8" y1="21" x2="19.8" y2="19" stroke-width="1.6"/>
+      </svg>
+    </div>
+    <span class="text-xl font-bold tracking-tight" style="color: var(--qk-text);">QuestKey</span>
+  </div>
+
+  <!-- Wizard card -->
+  <div class="w-full max-w-md rounded-2xl border p-8"
+       style="background: var(--qk-surface); border-color: var(--qk-border);">
+
+    <!-- Progress bar -->
+    <div class="mb-6">
+      <div class="flex justify-between text-xs mb-2" style="color: var(--qk-muted);">
+        <span id="step-label">Step 1 of 6</span>
+        <span id="step-pct">17%</span>
+      </div>
+      <div class="h-1 rounded-full" style="background: var(--qk-border);">
+        <div id="progress-bar" class="h-1 rounded-full transition-all duration-500"
+             style="background: var(--qk-accent); width: 17%;"></div>
+      </div>
+    </div>
+
+    <!-- Steps -->
+    <div class="wizard-steps">
+
+      <!-- ── Step 1: Welcome ── -->
+      <div id="step-1" class="wizard-step active flex flex-col items-center text-center pt-4 pb-2">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-5"
+             style="background: rgba(255,87,87,0.12); border: 1px solid rgba(255,87,87,0.25);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FF5757" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-2" style="color: var(--qk-text);">
+          Welcome to QuestKey
+        </h2>
+        <p class="text-sm leading-relaxed mb-8" style="color: var(--qk-muted);">
+          Let's set up your account in under 2 minutes. You'll be underwriting deals with AI before your next coffee.
+        </p>
+
+        <div class="w-full space-y-2.5 text-left mb-8">
+          <div class="flex items-center gap-3 p-3 rounded-xl" style="background: var(--qk-s2);">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(16,185,129,0.15);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" class="w-3.5 h-3.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span class="text-sm" style="color: var(--qk-text);">6 AI agents analyze every deal in 90 seconds</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-xl" style="background: var(--qk-s2);">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(16,185,129,0.15);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" class="w-3.5 h-3.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span class="text-sm" style="color: var(--qk-text);">STR, MTR, and LTR compared side-by-side</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-xl" style="background: var(--qk-s2);">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(16,185,129,0.15);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" class="w-3.5 h-3.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span class="text-sm" style="color: var(--qk-text);">Regulation flags, risk scores, and export-ready memos</span>
+          </div>
+        </div>
+
+        <button onclick="nextStep()"
+                class="w-full py-3.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-95"
+                style="background: var(--qk-accent);">
+          Get Started →
+        </button>
+      </div>
+      <!-- end step 1 -->
+
+    </div><!-- end wizard-steps -->
+
+    <!-- Back / Next nav (hidden on step 1 and 6) -->
+    <div id="wizard-nav" class="hidden mt-6 flex items-center justify-between">
+      <button onclick="prevStep()"
+              class="px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+              style="background: var(--qk-s2); color: var(--qk-muted);">
+        ← Back
+      </button>
+      <button onclick="nextStep()"
+              class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
+              style="background: var(--qk-accent);">
+        Continue →
+      </button>
+    </div>
+
+  </div><!-- end card -->
+
+  <p class="mt-6 text-xs" style="color: var(--qk-muted);">
+    Already have an account?
+    <span class="underline cursor-pointer hover:opacity-80" style="color: var(--qk-accent);">Sign in</span>
+  </p>
+
+</div><!-- end onboarding -->
+
+<!-- ════════════════════════════════════════════
+     APP SHELL (added in next steps)
+════════════════════════════════════════════ -->
+<div id="app-shell" class="hidden">
+  <!-- Dashboard, Analysis, Settings go here -->
+  <p class="p-8 text-center" style="color: var(--qk-muted);">App shell coming next…</p>
+</div>
+
+
+<script>
+  // ── Wizard state ──────────────────────────────
+  let currentStep = 1;
+  const TOTAL_STEPS = 6;
+
+  function goToStep(n) {
+    const prev = document.getElementById('step-' + currentStep);
+    const next = document.getElementById('step-' + n);
+    if (!next) return;
+
+    if (n > currentStep) {
+      prev.classList.remove('active');
+      prev.classList.add('prev');
+      next.style.transform = 'translateX(100%)';
+      next.style.opacity = '0';
+      next.classList.add('active');
+      requestAnimationFrame(() => {
+        next.style.transform = '';
+        next.style.opacity = '';
+      });
+    } else {
+      prev.classList.remove('active');
+      next.classList.remove('prev');
+      next.classList.add('active');
+    }
+
+    currentStep = n;
+    updateProgress();
+    updateNav();
+  }
+
+  function nextStep() {
+    if (currentStep < TOTAL_STEPS) goToStep(currentStep + 1);
+    else goToDashboard();
+  }
+
+  function prevStep() {
+    if (currentStep > 1) goToStep(currentStep - 1);
+  }
+
+  function updateProgress() {
+    const pct = Math.round((currentStep / TOTAL_STEPS) * 100);
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('step-label').textContent = 'Step ' + currentStep + ' of ' + TOTAL_STEPS;
+    document.getElementById('step-pct').textContent = pct + '%';
+  }
+
+  function updateNav() {
+    const nav = document.getElementById('wizard-nav');
+    nav.classList.toggle('hidden', currentStep === 1 || currentStep === 6);
+  }
+
+  function goToDashboard() {
+    document.getElementById('onboarding').classList.add('hidden');
+    document.getElementById('app-shell').classList.remove('hidden');
+  }
+</script>
+
+</body>
+</html>
