@@ -1,0 +1,13 @@
+[build]
+  command = "pnpm install --frozen-lockfile && pnpm --filter @workspace/yieldkey build"
+  publish = "artifacts/yieldkey/dist/public"
+
+[build.environment]
+  BASE_PATH = "/"
+  NODE_VERSION = "20"
+
+# SPA fallback — all routes serve index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
