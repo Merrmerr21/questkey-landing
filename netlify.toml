@@ -6,6 +6,18 @@
   BASE_PATH = "/"
   NODE_VERSION = "20"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Route waitlist API calls to the Netlify Function
+# Must come before the SPA fallback
+[[redirects]]
+  from = "/api/waitlist"
+  to = "/.netlify/functions/waitlist"
+  status = 200
+  force = true
+
 # SPA fallback — all routes serve index.html
 [[redirects]]
   from = "/*"
