@@ -314,6 +314,68 @@
       </div>
       <!-- end step 3 -->
 
+      <!-- ── Step 4: Market Focus ── -->
+      <div id="step-4" class="wizard-step flex flex-col pt-2 pb-2">
+        <h2 class="text-xl font-bold mb-1" style="color: var(--qk-text);">Where do you invest?</h2>
+        <p class="text-sm mb-4" style="color: var(--qk-muted);">Select all markets you're actively analyzing. Pick at least one.</p>
+
+        <div class="grid grid-cols-2 gap-2 overflow-y-auto" style="max-height: 320px;">
+          <!-- Markets -->
+          <div onclick="toggleMarket('Memphis, TN', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Memphis, TN</span>
+          </div>
+          <div onclick="toggleMarket('Little Rock, AR', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Little Rock, AR</span>
+          </div>
+          <div onclick="toggleMarket('Minneapolis, MN', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Minneapolis, MN</span>
+          </div>
+          <div onclick="toggleMarket('Fayetteville, AR', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Fayetteville, AR</span>
+          </div>
+          <div onclick="toggleMarket('Nashville, TN', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Nashville, TN</span>
+          </div>
+          <div onclick="toggleMarket('Austin, TX', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Austin, TX</span>
+          </div>
+          <div onclick="toggleMarket('Kansas City, MO', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Kansas City, MO</span>
+          </div>
+          <div onclick="toggleMarket('Birmingham, AL', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Birmingham, AL</span>
+          </div>
+          <div onclick="toggleMarket('Indianapolis, IN', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Indianapolis, IN</span>
+          </div>
+          <div onclick="toggleMarket('Columbus, OH', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Columbus, OH</span>
+          </div>
+          <div onclick="toggleMarket('Chattanooga, TN', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Chattanooga, TN</span>
+          </div>
+          <div onclick="toggleMarket('Tulsa, OK', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Tulsa, OK</span>
+          </div>
+        </div>
+
+        <p id="market-error" class="hidden mt-3 text-xs" style="color: var(--qk-danger);">Select at least one market to continue.</p>
+        <p class="mt-2 text-xs" style="color: var(--qk-muted);"><span id="market-count">0</span> selected</p>
+      </div>
+      <!-- end step 4 -->
+
     </div><!-- end wizard-steps -->
 
     <!-- Back / Next nav (hidden on step 1 and 6) -->
@@ -401,8 +463,38 @@
         return;
       }
     }
+    if (currentStep === 4) {
+      if (selectedMarkets.size === 0) {
+        document.getElementById('market-error').classList.remove('hidden');
+        return;
+      }
+    }
     if (currentStep < TOTAL_STEPS) goToStep(currentStep + 1);
     else goToDashboard();
+  }
+
+  // ── Market selection ──────────────────────────
+  const selectedMarkets = new Set();
+
+  function toggleMarket(market, el) {
+    const check = el.querySelector('.market-check');
+    if (selectedMarkets.has(market)) {
+      selectedMarkets.delete(market);
+      el.style.borderColor = 'var(--qk-border)';
+      el.style.background  = 'var(--qk-s2)';
+      check.style.background   = 'transparent';
+      check.style.borderColor  = 'var(--qk-border)';
+      check.innerHTML = '';
+    } else {
+      selectedMarkets.add(market);
+      el.style.borderColor = 'var(--qk-accent)';
+      el.style.background  = 'rgba(255,87,87,0.06)';
+      check.style.background  = 'var(--qk-accent)';
+      check.style.borderColor = 'var(--qk-accent)';
+      check.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" class="w-2.5 h-2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+    }
+    document.getElementById('market-count').textContent = selectedMarkets.size;
+    if (selectedMarkets.size > 0) document.getElementById('market-error').classList.add('hidden');
   }
 
   // ── Strategy selection ────────────────────────
