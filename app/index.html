@@ -428,6 +428,52 @@
       </div>
       <!-- end step 5 -->
 
+      <!-- ── Step 6: Done ── -->
+      <div id="step-6" class="wizard-step flex flex-col items-center text-center pt-4 pb-2">
+
+        <!-- Animated checkmark -->
+        <div class="relative w-20 h-20 mb-6">
+          <svg viewBox="0 0 80 80" fill="none" class="w-20 h-20">
+            <circle cx="40" cy="40" r="36"
+                    stroke="rgba(16,185,129,0.15)" stroke-width="4"/>
+            <circle id="done-circle" cx="40" cy="40" r="36"
+                    stroke="#10B981" stroke-width="4"
+                    stroke-linecap="round"
+                    stroke-dasharray="226" stroke-dashoffset="226"
+                    transform="rotate(-90 40 40)"
+                    style="transition: stroke-dashoffset 0.6s ease;"/>
+            <polyline id="done-check" points="24,40 35,52 56,28"
+                      stroke="#10B981" stroke-width="4.5"
+                      stroke-linecap="round" stroke-linejoin="round"
+                      fill="none"
+                      stroke-dasharray="50" stroke-dashoffset="50"
+                      style="transition: stroke-dashoffset 0.4s ease 0.5s;"/>
+          </svg>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-2" style="color: var(--qk-text);">You're all set!</h2>
+        <p class="text-sm leading-relaxed mb-2" style="color: var(--qk-muted);">
+          Your QuestKey account is ready. Head to your dashboard to run your first analysis.
+        </p>
+
+        <!-- Summary pills -->
+        <div id="setup-summary" class="flex flex-wrap justify-center gap-2 my-5">
+          <span class="px-3 py-1 rounded-full text-xs font-medium" style="background: rgba(255,87,87,0.12); color: var(--qk-accent);" id="done-strategy-pill">STR</span>
+          <span class="px-3 py-1 rounded-full text-xs font-medium" style="background: rgba(16,185,129,0.12); color: var(--qk-success);" id="done-markets-pill">1 market</span>
+        </div>
+
+        <button onclick="goToDashboard()"
+                class="w-full py-3.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-95"
+                style="background: var(--qk-accent);">
+          Go to Dashboard →
+        </button>
+
+        <p class="mt-4 text-xs" style="color: var(--qk-muted);">
+          You can edit these preferences anytime in Settings.
+        </p>
+      </div>
+      <!-- end step 6 -->
+
     </div><!-- end wizard-steps -->
 
     <!-- Back / Next nav (hidden on step 1 and 6) -->
@@ -491,6 +537,7 @@
     currentStep = n;
     updateProgress();
     updateNav();
+    if (n === 6) triggerDoneAnimation();
   }
 
   function nextStep() {
@@ -622,6 +669,24 @@
   function updateNav() {
     const nav = document.getElementById('wizard-nav');
     nav.classList.toggle('hidden', currentStep === 1 || currentStep === 6);
+  }
+
+  function triggerDoneAnimation() {
+    // Update summary pills
+    if (selectedStrategy) {
+      const labels = { STR: 'STR', MTR: 'MTR', LTR: 'LTR', ALL: 'All Three' };
+      document.getElementById('done-strategy-pill').textContent = labels[selectedStrategy] || selectedStrategy;
+    }
+    const mc = selectedMarkets.size;
+    document.getElementById('done-markets-pill').textContent = mc + (mc === 1 ? ' market' : ' markets');
+
+    // Animate circle then checkmark
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        document.getElementById('done-circle').style.strokeDashoffset = '0';
+        document.getElementById('done-check').style.strokeDashoffset  = '0';
+      }, 80);
+    });
   }
 
   function goToDashboard() {
