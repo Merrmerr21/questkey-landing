@@ -246,6 +246,74 @@
       </div>
       <!-- end step 2 -->
 
+      <!-- ── Step 3: Strategy Selection ── -->
+      <div id="step-3" class="wizard-step flex flex-col pt-2 pb-2">
+        <h2 class="text-xl font-bold mb-1" style="color: var(--qk-text);">What's your rental strategy?</h2>
+        <p class="text-sm mb-5" style="color: var(--qk-muted);">We'll tailor your analysis defaults around this. You can change it anytime.</p>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <!-- STR -->
+          <div id="strat-STR" onclick="selectStrategy('STR')"
+               class="strategy-card cursor-pointer rounded-xl p-4 border transition-all"
+               style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style="background: rgba(255,87,87,0.12);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FF5757" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+            </div>
+            <div class="text-sm font-bold mb-0.5" style="color: var(--qk-text);">STR</div>
+            <div class="text-xs" style="color: var(--qk-muted);">Short-term rental<br/>Airbnb / VRBO</div>
+          </div>
+
+          <!-- MTR -->
+          <div id="strat-MTR" onclick="selectStrategy('MTR')"
+               class="strategy-card cursor-pointer rounded-xl p-4 border transition-all"
+               style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style="background: rgba(245,158,11,0.12);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+              </svg>
+            </div>
+            <div class="text-sm font-bold mb-0.5" style="color: var(--qk-text);">MTR</div>
+            <div class="text-xs" style="color: var(--qk-muted);">Mid-term rental<br/>30–180 days</div>
+          </div>
+
+          <!-- LTR -->
+          <div id="strat-LTR" onclick="selectStrategy('LTR')"
+               class="strategy-card cursor-pointer rounded-xl p-4 border transition-all"
+               style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style="background: rgba(16,185,129,0.12);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/>
+                <path d="M4 21h16"/>
+                <path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/>
+              </svg>
+            </div>
+            <div class="text-sm font-bold mb-0.5" style="color: var(--qk-text);">LTR</div>
+            <div class="text-xs" style="color: var(--qk-muted);">Long-term rental<br/>12-month lease</div>
+          </div>
+
+          <!-- All Three -->
+          <div id="strat-ALL" onclick="selectStrategy('ALL')"
+               class="strategy-card cursor-pointer rounded-xl p-4 border transition-all"
+               style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style="background: rgba(139,92,246,0.12);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+              </svg>
+            </div>
+            <div class="text-sm font-bold mb-0.5" style="color: var(--qk-text);">All Three</div>
+            <div class="text-xs" style="color: var(--qk-muted);">Compare STR, MTR<br/>and LTR side-by-side</div>
+          </div>
+        </div>
+
+        <p id="strat-error" class="hidden mt-3 text-xs" style="color: var(--qk-danger);">Please select a strategy to continue.</p>
+      </div>
+      <!-- end step 3 -->
+
     </div><!-- end wizard-steps -->
 
     <!-- Back / Next nav (hidden on step 1 and 6) -->
@@ -327,8 +395,29 @@
       }
       err.classList.add('hidden');
     }
+    if (currentStep === 3) {
+      if (!selectedStrategy) {
+        document.getElementById('strat-error').classList.remove('hidden');
+        return;
+      }
+    }
     if (currentStep < TOTAL_STEPS) goToStep(currentStep + 1);
     else goToDashboard();
+  }
+
+  // ── Strategy selection ────────────────────────
+  let selectedStrategy = null;
+
+  function selectStrategy(strategy) {
+    selectedStrategy = strategy;
+    document.querySelectorAll('.strategy-card').forEach(card => {
+      card.style.borderColor = 'var(--qk-border)';
+      card.style.background  = 'var(--qk-s2)';
+    });
+    const el = document.getElementById('strat-' + strategy);
+    el.style.borderColor = 'var(--qk-accent)';
+    el.style.background  = 'rgba(255,87,87,0.06)';
+    document.getElementById('strat-error').classList.add('hidden');
   }
 
   function togglePasswordVisibility() {
