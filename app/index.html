@@ -376,6 +376,58 @@
       </div>
       <!-- end step 4 -->
 
+      <!-- ── Step 5: Connect Data ── -->
+      <div id="step-5" class="wizard-step flex flex-col pt-2 pb-2">
+        <h2 class="text-xl font-bold mb-1" style="color: var(--qk-text);">Connect your data</h2>
+        <p class="text-sm mb-5" style="color: var(--qk-muted);">Upload a property CSV to pre-load your portfolio. Totally optional — you can always add properties manually later.</p>
+
+        <!-- Drop zone -->
+        <div id="drop-zone"
+             onclick="document.getElementById('csv-input').click()"
+             ondragover="handleDragOver(event)"
+             ondragleave="handleDragLeave(event)"
+             ondrop="handleDrop(event)"
+             class="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-8 cursor-pointer transition-all"
+             style="border-color: var(--qk-border); background: var(--qk-s2);">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(255,87,87,0.1);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FF5757" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div class="text-center">
+            <p class="text-sm font-medium" style="color: var(--qk-text);">Drop your CSV here or <span style="color: var(--qk-accent);">browse</span></p>
+            <p class="text-xs mt-1" style="color: var(--qk-muted);">Address, purchase price, strategy — we'll handle the rest</p>
+          </div>
+          <input id="csv-input" type="file" accept=".csv" class="hidden" onchange="handleFileSelect(event)" />
+        </div>
+
+        <!-- File selected state (hidden by default) -->
+        <div id="file-selected" class="hidden mt-3 flex items-center gap-3 px-4 py-3 rounded-xl" style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 flex-shrink-0">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span id="file-name" class="text-sm font-medium flex-1" style="color: var(--qk-success);">properties.csv</span>
+          <button onclick="clearFile(event)" class="text-xs hover:opacity-70 transition-opacity" style="color: var(--qk-muted);">Remove</button>
+        </div>
+
+        <!-- Example format -->
+        <div class="mt-4 p-3 rounded-xl" style="background: var(--qk-s2); border: 1px solid var(--qk-border);">
+          <p class="text-xs font-medium mb-1.5" style="color: var(--qk-muted);">Expected CSV format</p>
+          <code class="text-xs font-mono" style="color: var(--qk-text);">address, price, strategy<br/>812 Birchwood Ave Little Rock AR, 285000, MTR</code>
+        </div>
+
+        <!-- Skip -->
+        <button onclick="nextStep()"
+                class="mt-5 text-sm font-medium underline underline-offset-2 transition-opacity hover:opacity-70 text-center"
+                style="color: var(--qk-muted);">
+          Skip for now →
+        </button>
+      </div>
+      <!-- end step 5 -->
+
     </div><!-- end wizard-steps -->
 
     <!-- Back / Next nav (hidden on step 1 and 6) -->
@@ -471,6 +523,40 @@
     }
     if (currentStep < TOTAL_STEPS) goToStep(currentStep + 1);
     else goToDashboard();
+  }
+
+  // ── File / CSV upload ─────────────────────────
+  function handleDragOver(e) {
+    e.preventDefault();
+    const dz = document.getElementById('drop-zone');
+    dz.style.borderColor = 'var(--qk-accent)';
+    dz.style.background  = 'rgba(255,87,87,0.05)';
+  }
+  function handleDragLeave(e) {
+    const dz = document.getElementById('drop-zone');
+    dz.style.borderColor = 'var(--qk-border)';
+    dz.style.background  = 'var(--qk-s2)';
+  }
+  function handleDrop(e) {
+    e.preventDefault();
+    handleDragLeave(e);
+    const file = e.dataTransfer.files[0];
+    if (file) showFile(file.name);
+  }
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) showFile(file.name);
+  }
+  function showFile(name) {
+    document.getElementById('file-name').textContent = name;
+    document.getElementById('file-selected').classList.remove('hidden');
+    document.getElementById('drop-zone').style.opacity = '0.5';
+  }
+  function clearFile(e) {
+    e.stopPropagation();
+    document.getElementById('file-selected').classList.add('hidden');
+    document.getElementById('drop-zone').style.opacity = '1';
+    document.getElementById('csv-input').value = '';
   }
 
   // ── Market selection ──────────────────────────
