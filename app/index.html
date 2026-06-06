@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuestKey — App</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['IBM Plex Mono', 'monospace'],
+          },
+          colors: {
+            qk: {
+              bg:         '#FEF9F7',
+              surface:    '#FFFFFF',
+              's2':       '#FFF2EE',
+              border:     '#EAD9D4',
+              accent:     '#FF5757',
+              text:       '#1C1917',
+              muted:      '#78716C',
+              success:    '#059669',
+              warning:    '#D97706',
+              danger:     '#DC2626',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --qk-bg:      #FEF9F7;
+      --qk-surface: #FFFFFF;
+      --qk-s2:      #FFF2EE;
+      --qk-border:  #EAD9D4;
+      --qk-accent:  #FF5757;
+      --qk-text:    #1C1917;
+      --qk-muted:   #78716C;
+      --qk-success: #059669;
+      --qk-warning: #D97706;
+      --qk-danger:  #DC2626;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background: var(--qk-bg);
+      color: var(--qk-text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Wizard step slide transitions ── */
+    .wizard-steps {
+      position: relative;
+      overflow: hidden;
+      min-height: 420px;
+    }
+    .wizard-step {
+      position: absolute;
+      inset: 0;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1),
+                  opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .wizard-step.active {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+      position: relative;
+    }
+    .wizard-step.prev {
+      transform: translateX(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ── Stat card stagger fade-in ── */
+    @keyframes fadeUpIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .stat-card { animation: fadeUpIn 0.45s ease both; }
+    .stat-card:nth-child(1) { animation-delay: 0s; }
+    .stat-card:nth-child(2) { animation-delay: 0.08s; }
+    .stat-card:nth-child(3) { animation-delay: 0.16s; }
+    .stat-card:nth-child(4) { animation-delay: 0.24s; }
+
+    /* ── Sidebar nav active state ── */
+    .nav-link { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; color: var(--qk-muted); transition: background 0.15s, color 0.15s; cursor: pointer; }
+    .nav-link:hover { background: var(--qk-s2); color: var(--qk-text); }
+    .nav-link.active { background: rgba(255,87,87,0.10); color: var(--qk-accent); font-weight: 600; }
+
+    /* ── Score badge colors ── */
+    .score-high   { background: rgba(5,150,105,0.10);  color: #059669; }
+    .score-mid    { background: rgba(217,119,6,0.10);  color: #D97706; }
+    .score-low    { background: rgba(220,38,38,0.10);  color: #DC2626; }
+
+    /* ── Table row hover ── */
+    .trow:hover td { background: var(--qk-s2); }
+
+    /* ── Agent pulse ring ── */
+    @keyframes pulseRing {
+      0%   { box-shadow: 0 0 0 0 rgba(255,87,87,0.55); }
+      70%  { box-shadow: 0 0 0 6px rgba(255,87,87,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,87,87,0); }
+    }
+    .agent-running { animation: pulseRing 1.4s infinite; }
+
+    /* ── Score gauge ── */
+    .gauge-ring { transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
+
+    /* ── Agent stepper ── */
+    .agent-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; cursor:pointer; transition:background 0.15s; }
+    .agent-row:hover { background: var(--qk-s2); }
+    .agent-row.active-agent { background: rgba(255,87,87,0.07); }
+
+    /* ── Strategy toggle ── */
+    .strat-tab { padding:6px 14px; border-radius:8px; font-size:0.8rem; font-weight:600; cursor:pointer; transition:background 0.15s, color 0.15s; color: var(--qk-muted); }
+    .strat-tab.active { background: var(--qk-accent); color:#fff; }
+    .strat-tab:not(.active):hover { background: var(--qk-s2); color: var(--qk-text); }
+
+    /* ── Toggle switches (Settings) ── */
+    .toggle-switch { width:44px; height:24px; border-radius:12px; cursor:pointer; transition:background 0.2s; position:relative; flex-shrink:0; }
+    .toggle-thumb  { position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:transform 0.2s; }
+
+    /* ── Scrollbar styling ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--qk-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--qk-border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     ONBOARDING VIEW
+════════════════════════════════════════════ -->
+<div id="onboarding" class="min-h-screen flex flex-col items-center justify-center px-4 py-12"
+     style="background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(255,87,87,0.08), transparent), var(--qk-bg);">
+
+  <!-- Top logo -->
+  <div class="mb-8 flex items-center gap-2.5">
+    <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background: var(--qk-accent);">
+      <!-- Q-key icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+        <circle cx="10" cy="10" r="8.5" stroke-width="2.2"/>
+        <line x1="16.0" y1="16.0" x2="21" y2="21" stroke-width="2.2"/>
+        <line x1="19.5" y1="22.5" x2="22.5" y2="19.5" stroke-width="2"/>
+        <line x1="17.8" y1="21" x2="19.8" y2="19" stroke-width="1.6"/>
+      </svg>
+    </div>
+    <span class="text-xl font-bold tracking-tight" style="color: var(--qk-text);">QuestKey</span>
+  </div>
+
+  <!-- Wizard card -->
+  <div class="w-full max-w-md rounded-2xl border p-8"
+       style="background: var(--qk-surface); border-color: var(--qk-border);">
+
+    <!-- Progress bar -->
+    <div class="mb-6">
+      <div class="flex justify-between text-xs mb-2" style="color: var(--qk-muted);">
+        <span id="step-label">Step 1 of 6</span>
+        <span id="step-pct">17%</span>
+      </div>
+      <div class="h-1 rounded-full" style="background: var(--qk-border);">
+        <div id="progress-bar" class="h-1 rounded-full transition-all duration-500"
+             style="background: var(--qk-accent); width: 17%;"></div>
+      </div>
+    </div>
+
+    <!-- Steps -->
+    <div class="wizard-steps">
+
+      <!-- ── Step 1: Welcome ── -->
+      <div id="step-1" class="wizard-step active flex flex-col items-center text-center pt-4 pb-2">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-5"
+             style="background: rgba(255,87,87,0.12); border: 1px solid rgba(255,87,87,0.25);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FF5757" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-2" style="color: var(--qk-text);">
+          Welcome to QuestKey
+        </h2>
+        <p class="text-sm leading-relaxed mb-8" style="color: var(--qk-muted);">
+          Let's set up your account in under 2 minutes. You'll be underwriting deals with AI before your next coffee.
+        </p>
+
+        <div class="w-full space-y-2.5 text-left mb-8">
+          <div class="flex items-center gap-3 p-3 rounded-xl" style="background: var(--qk-s2);">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(16,185,129,0.15);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" class="w-3.5 h-3.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span class="text-sm" style="color: var(--qk-text);">6 AI agents analyze every deal in 90 seconds</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-xl" style="background: var(--qk-s2);">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(16,185,129,0.15);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" class="w-3.5 h-3.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span class="text-sm" style="color: var(--qk-text);">STR, MTR, and LTR compared side-by-side</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-xl" style="background: var(--qk-s2);">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(16,185,129,0.15);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" class="w-3.5 h-3.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span class="text-sm" style="color: var(--qk-text);">Regulation flags, risk scores, and export-ready memos</span>
+          </div>
+        </div>
+
+        <button onclick="nextStep()"
+                class="w-full py-3.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-95"
+                style="background: var(--qk-accent);">
+          Get Started →
+        </button>
+      </div>
+      <!-- end step 1 -->
+
+      <!-- ── Step 2: Account Info ── -->
+      <div id="step-2" class="wizard-step flex flex-col pt-2 pb-2">
+        <h2 class="text-xl font-bold mb-1" style="color: var(--qk-text);">Create your account</h2>
+        <p class="text-sm mb-6" style="color: var(--qk-muted);">You'll use these to sign in to QuestKey.</p>
+
+        <div class="space-y-3">
+          <!-- Full name -->
+          <div>
+            <label class="block text-xs font-medium mb-1.5" style="color: var(--qk-muted);">Full name</label>
+            <input id="acct-name" type="text" placeholder="Alex Merritt"
+                   class="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
+                   style="background: var(--qk-s2); border: 1px solid var(--qk-border); color: var(--qk-text);"
+                   onfocus="this.style.borderColor='var(--qk-accent)'"
+                   onblur="this.style.borderColor='var(--qk-border)'" />
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label class="block text-xs font-medium mb-1.5" style="color: var(--qk-muted);">Email address</label>
+            <input id="acct-email" type="email" placeholder="alex@questkey.com"
+                   class="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
+                   style="background: var(--qk-s2); border: 1px solid var(--qk-border); color: var(--qk-text);"
+                   onfocus="this.style.borderColor='var(--qk-accent)'"
+                   onblur="this.style.borderColor='var(--qk-border)'" />
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="block text-xs font-medium mb-1.5" style="color: var(--qk-muted);">Password</label>
+            <div class="relative">
+              <input id="acct-password" type="password" placeholder="Min. 8 characters"
+                     class="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all pr-12"
+                     style="background: var(--qk-s2); border: 1px solid var(--qk-border); color: var(--qk-text);"
+                     onfocus="this.style.borderColor='var(--qk-accent)'"
+                     onblur="this.style.borderColor='var(--qk-border)'" />
+              <button onclick="togglePasswordVisibility()"
+                      class="absolute right-3 top-1/2 -translate-y-1/2 p-1 transition-opacity hover:opacity-70"
+                      style="color: var(--qk-muted);" type="button">
+                <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Validation message -->
+        <p id="acct-error" class="hidden mt-3 text-xs" style="color: var(--qk-danger);">Please fill in all fields.</p>
+
+        <p class="mt-5 text-xs leading-relaxed" style="color: var(--qk-muted);">
+          By continuing you agree to QuestKey's
+          <span class="underline cursor-pointer" style="color: var(--qk-accent);">Terms of Service</span> and
+          <span class="underline cursor-pointer" style="color: var(--qk-accent);">Privacy Policy</span>.
+        </p>
+      </div>
+      <!-- end step 2 -->
+
+      <!-- ── Step 3: Strategy Selection ── -->
+      <div id="step-3" class="wizard-step flex flex-col pt-2 pb-2">
+        <h2 class="text-xl font-bold mb-1" style="color: var(--qk-text);">What's your rental strategy?</h2>
+        <p class="text-sm mb-5" style="color: var(--qk-muted);">We'll tailor your analysis defaults around this. You can change it anytime.</p>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <!-- STR -->
+          <div id="strat-STR" onclick="selectStrategy('STR')"
+               class="strategy-card cursor-pointer rounded-xl p-4 border transition-all"
+               style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style="background: rgba(255,87,87,0.12);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FF5757" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+            </div>
+            <div class="text-sm font-bold mb-0.5" style="color: var(--qk-text);">STR</div>
+            <div class="text-xs" style="color: var(--qk-muted);">Short-term rental<br/>Airbnb / VRBO</div>
+          </div>
+
+          <!-- MTR -->
+          <div id="strat-MTR" onclick="selectStrategy('MTR')"
+               class="strategy-card cursor-pointer rounded-xl p-4 border transition-all"
+               style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style="background: rgba(245,158,11,0.12);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+              </svg>
+            </div>
+            <div class="text-sm font-bold mb-0.5" style="color: var(--qk-text);">MTR</div>
+            <div class="text-xs" style="color: var(--qk-muted);">Mid-term rental<br/>30–180 days</div>
+          </div>
+
+          <!-- LTR -->
+          <div id="strat-LTR" onclick="selectStrategy('LTR')"
+               class="strategy-card cursor-pointer rounded-xl p-4 border transition-all"
+               style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style="background: rgba(16,185,129,0.12);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/>
+                <path d="M4 21h16"/>
+                <path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/>
+              </svg>
+            </div>
+            <div class="text-sm font-bold mb-0.5" style="color: var(--qk-text);">LTR</div>
+            <div class="text-xs" style="color: var(--qk-muted);">Long-term rental<br/>12-month lease</div>
+          </div>
+
+          <!-- All Three -->
+          <div id="strat-ALL" onclick="selectStrategy('ALL')"
+               class="strategy-card cursor-pointer rounded-xl p-4 border transition-all"
+               style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style="background: rgba(139,92,246,0.12);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+              </svg>
+            </div>
+            <div class="text-sm font-bold mb-0.5" style="color: var(--qk-text);">All Three</div>
+            <div class="text-xs" style="color: var(--qk-muted);">Compare STR, MTR<br/>and LTR side-by-side</div>
+          </div>
+        </div>
+
+        <p id="strat-error" class="hidden mt-3 text-xs" style="color: var(--qk-danger);">Please select a strategy to continue.</p>
+      </div>
+      <!-- end step 3 -->
+
+      <!-- ── Step 4: Market Focus ── -->
+      <div id="step-4" class="wizard-step flex flex-col pt-2 pb-2">
+        <h2 class="text-xl font-bold mb-1" style="color: var(--qk-text);">Where do you invest?</h2>
+        <p class="text-sm mb-4" style="color: var(--qk-muted);">Select all markets you're actively analyzing. Pick at least one.</p>
+
+        <div class="grid grid-cols-2 gap-2 overflow-y-auto" style="max-height: 320px;">
+          <!-- Markets -->
+          <div onclick="toggleMarket('Memphis, TN', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Memphis, TN</span>
+          </div>
+          <div onclick="toggleMarket('Little Rock, AR', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Little Rock, AR</span>
+          </div>
+          <div onclick="toggleMarket('Minneapolis, MN', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Minneapolis, MN</span>
+          </div>
+          <div onclick="toggleMarket('Fayetteville, AR', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Fayetteville, AR</span>
+          </div>
+          <div onclick="toggleMarket('Nashville, TN', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Nashville, TN</span>
+          </div>
+          <div onclick="toggleMarket('Austin, TX', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Austin, TX</span>
+          </div>
+          <div onclick="toggleMarket('Kansas City, MO', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Kansas City, MO</span>
+          </div>
+          <div onclick="toggleMarket('Birmingham, AL', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Birmingham, AL</span>
+          </div>
+          <div onclick="toggleMarket('Indianapolis, IN', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Indianapolis, IN</span>
+          </div>
+          <div onclick="toggleMarket('Columbus, OH', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Columbus, OH</span>
+          </div>
+          <div onclick="toggleMarket('Chattanooga, TN', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Chattanooga, TN</span>
+          </div>
+          <div onclick="toggleMarket('Tulsa, OK', this)" class="market-chip flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer border transition-all" style="background: var(--qk-s2); border-color: var(--qk-border);">
+            <div class="market-check w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all" style="border-color: var(--qk-border);"></div>
+            <span class="text-sm" style="color: var(--qk-text);">Tulsa, OK</span>
+          </div>
+        </div>
+
+        <p id="market-error" class="hidden mt-3 text-xs" style="color: var(--qk-danger);">Select at least one market to continue.</p>
+        <p class="mt-2 text-xs" style="color: var(--qk-muted);"><span id="market-count">0</span> selected</p>
+      </div>
+      <!-- end step 4 -->
+
+      <!-- ── Step 5: Connect Data ── -->
+      <div id="step-5" class="wizard-step flex flex-col pt-2 pb-2">
+        <h2 class="text-xl font-bold mb-1" style="color: var(--qk-text);">Connect your data</h2>
+        <p class="text-sm mb-5" style="color: var(--qk-muted);">Upload a property CSV to pre-load your portfolio. Totally optional — you can always add properties manually later.</p>
+
+        <!-- Drop zone -->
+        <div id="drop-zone"
+             onclick="document.getElementById('csv-input').click()"
+             ondragover="handleDragOver(event)"
+             ondragleave="handleDragLeave(event)"
+             ondrop="handleDrop(event)"
+             class="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-8 cursor-pointer transition-all"
+             style="border-color: var(--qk-border); background: var(--qk-s2);">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(255,87,87,0.1);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FF5757" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div class="text-center">
+            <p class="text-sm font-medium" style="color: var(--qk-text);">Drop your CSV here or <span style="color: var(--qk-accent);">browse</span></p>
+            <p class="text-xs mt-1" style="color: var(--qk-muted);">Address, purchase price, strategy — we'll handle the rest</p>
+          </div>
+          <input id="csv-input" type="file" accept=".csv" class="hidden" onchange="handleFileSelect(event)" />
+        </div>
+
+        <!-- File selected state (hidden by default) -->
+        <div id="file-selected" class="hidden mt-3 flex items-center gap-3 px-4 py-3 rounded-xl" style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 flex-shrink-0">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span id="file-name" class="text-sm font-medium flex-1" style="color: var(--qk-success);">properties.csv</span>
+          <button onclick="clearFile(event)" class="text-xs hover:opacity-70 transition-opacity" style="color: var(--qk-muted);">Remove</button>
+        </div>
+
+        <!-- Example format -->
+        <div class="mt-4 p-3 rounded-xl" style="background: var(--qk-s2); border: 1px solid var(--qk-border);">
+          <p class="text-xs font-medium mb-1.5" style="color: var(--qk-muted);">Expected CSV format</p>
+          <code class="text-xs font-mono" style="color: var(--qk-text);">address, price, strategy<br/>812 Birchwood Ave Little Rock AR, 285000, MTR</code>
+        </div>
+
+        <!-- Skip -->
+        <button onclick="nextStep()"
+                class="mt-5 text-sm font-medium underline underline-offset-2 transition-opacity hover:opacity-70 text-center"
+                style="color: var(--qk-muted);">
+          Skip for now →
+        </button>
+      </div>
+      <!-- end step 5 -->
+
+      <!-- ── Step 6: Done ── -->
+      <div id="step-6" class="wizard-step flex flex-col items-center text-center pt-4 pb-2">
+
+        <!-- Animated checkmark -->
+        <div class="relative w-20 h-20 mb-6">
+          <svg viewBox="0 0 80 80" fill="none" class="w-20 h-20">
+            <circle cx="40" cy="40" r="36"
+                    stroke="rgba(16,185,129,0.15)" stroke-width="4"/>
+            <circle id="done-circle" cx="40" cy="40" r="36"
+                    stroke="#10B981" stroke-width="4"
+                    stroke-linecap="round"
+                    stroke-dasharray="226" stroke-dashoffset="226"
+                    transform="rotate(-90 40 40)"
+                    style="transition: stroke-dashoffset 0.6s ease;"/>
+            <polyline id="done-check" points="24,40 35,52 56,28"
+                      stroke="#10B981" stroke-width="4.5"
+                      stroke-linecap="round" stroke-linejoin="round"
+                      fill="none"
+                      stroke-dasharray="50" stroke-dashoffset="50"
+                      style="transition: stroke-dashoffset 0.4s ease 0.5s;"/>
+          </svg>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-2" style="color: var(--qk-text);">You're all set!</h2>
+        <p class="text-sm leading-relaxed mb-2" style="color: var(--qk-muted);">
+          Your QuestKey account is ready. Head to your dashboard to run your first analysis.
+        </p>
+
+        <!-- Summary pills -->
+        <div id="setup-summary" class="flex flex-wrap justify-center gap-2 my-5">
+          <span class="px-3 py-1 rounded-full text-xs font-medium" style="background: rgba(255,87,87,0.12); color: var(--qk-accent);" id="done-strategy-pill">STR</span>
+          <span class="px-3 py-1 rounded-full text-xs font-medium" style="background: rgba(16,185,129,0.12); color: var(--qk-success);" id="done-markets-pill">1 market</span>
+        </div>
+
+        <button onclick="goToDashboard()"
+                class="w-full py-3.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-95"
+                style="background: var(--qk-accent);">
+          Go to Dashboard →
+        </button>
+
+        <p class="mt-4 text-xs" style="color: var(--qk-muted);">
+          You can edit these preferences anytime in Settings.
+        </p>
+      </div>
+      <!-- end step 6 -->
+
+    </div><!-- end wizard-steps -->
+
+    <!-- Back / Next nav (hidden on step 1 and 6) -->
+    <div id="wizard-nav" class="hidden mt-6 flex items-center justify-between">
+      <button onclick="prevStep()"
+              class="px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+              style="background: var(--qk-s2); color: var(--qk-muted);">
+        ← Back
+      </button>
+      <button onclick="nextStep()"
+              class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
+              style="background: var(--qk-accent);">
+        Continue →
+      </button>
+    </div>
+
+  </div><!-- end card -->
+
+  <p class="mt-6 text-xs" style="color: var(--qk-muted);">
+    Already have an account?
+    <span class="underline cursor-pointer hover:opacity-80" style="color: var(--qk-accent);">Sign in</span>
+  </p>
+
+</div><!-- end onboarding -->
+
+<!-- ════════════════════════════════════════════
+     APP SHELL (added in next steps)
+════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════
+     APP SHELL
+════════════════════════════════════════════ -->
+<div id="app-shell" class="hidden min-h-screen" style="background: var(--qk-bg);">
+
+  <!-- ── Desktop Sidebar ── -->
+  <aside class="hidden md:flex flex-col fixed top-0 left-0 h-screen w-64 border-r z-30"
+         style="background: var(--qk-surface); border-color: var(--qk-border);">
+
+    <!-- Logo -->
+    <div class="flex items-center gap-2.5 px-5 py-5 border-b" style="border-color: var(--qk-border);">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background: var(--qk-accent);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+          <circle cx="10" cy="10" r="8.5" stroke-width="2.2"/>
+          <line x1="16" y1="16" x2="21" y2="21" stroke-width="2.2"/>
+          <line x1="19.5" y1="22.5" x2="22.5" y2="19.5" stroke-width="2"/>
+          <line x1="17.8" y1="21" x2="19.8" y2="19" stroke-width="1.6"/>
+        </svg>
+      </div>
+      <span class="font-bold text-base tracking-tight" style="color: var(--qk-text);">QuestKey</span>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <div onclick="showAppView('dashboard')" id="nav-dashboard" class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 flex-shrink-0"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </div>
+      <div onclick="showAppView('analysis')" id="nav-analysis" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 flex-shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        New Analysis
+      </div>
+      <div class="nav-link opacity-50 cursor-default">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 flex-shrink-0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Properties
+      </div>
+      <div class="nav-link opacity-50 cursor-default">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 flex-shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Reports
+      </div>
+      <div onclick="showAppView('settings')" id="nav-settings" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 flex-shrink-0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div>
+    </nav>
+
+    <!-- User -->
+    <div class="px-4 py-4 border-t" style="border-color: var(--qk-border);">
+      <div class="flex items-center gap-3">
+        <img src="https://placehold.co/32x32/FEDDDA/FF5757?text=AM" alt="avatar" class="w-8 h-8 rounded-full flex-shrink-0" />
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-semibold truncate" style="color: var(--qk-text);">Alex Merritt</p>
+          <p class="text-xs truncate" style="color: var(--qk-muted);">alex@questkey.com</p>
+        </div>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0" style="background: rgba(255,87,87,0.12); color: var(--qk-accent);">Pro</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main content ── -->
+  <main class="md:ml-64 pb-20 md:pb-0 min-h-screen">
+
+    <!-- ════ DASHBOARD VIEW ════ -->
+    <div id="view-dashboard" class="app-view">
+      <!-- Header -->
+      <div class="sticky top-0 z-20 flex items-center justify-between px-6 py-4 border-b"
+           style="background: var(--qk-surface); border-color: var(--qk-border);">
+        <div>
+          <p class="text-xs font-medium mb-0.5" style="color: var(--qk-muted);">Welcome back</p>
+          <h1 class="text-xl font-bold" style="color: var(--qk-text);">Good morning, Alex</h1>
+        </div>
+        <button onclick="showAppView('analysis')"
+                class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95"
+                style="background: var(--qk-accent);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Analysis
+        </button>
+      </div>
+
+      <div class="px-6 py-6">
+        <!-- Stats row -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="stat-card rounded-xl p-4 border" style="background: var(--qk-surface); border-color: var(--qk-border);">
+            <p class="text-xs font-medium mb-1" style="color: var(--qk-muted);">Properties Analyzed</p>
+            <p class="text-3xl font-bold font-mono" style="color: var(--qk-text);">14</p>
+            <p class="text-xs mt-1" style="color: var(--qk-success);">↑ 3 this month</p>
+          </div>
+          <div class="stat-card rounded-xl p-4 border" style="background: var(--qk-surface); border-color: var(--qk-border);">
+            <p class="text-xs font-medium mb-1" style="color: var(--qk-muted);">Avg QuestKey Score</p>
+            <p class="text-3xl font-bold font-mono" style="color: var(--qk-text);">75.5</p>
+            <p class="text-xs mt-1" style="color: var(--qk-success);">↑ 2.1 vs last month</p>
+          </div>
+          <div class="stat-card rounded-xl p-4 border" style="background: var(--qk-surface); border-color: var(--qk-border);">
+            <p class="text-xs font-medium mb-1" style="color: var(--qk-muted);">Best Deal</p>
+            <p class="text-base font-bold leading-tight mt-1" style="color: var(--qk-text);">812 Birchwood Ave</p>
+            <p class="text-xs mt-1" style="color: var(--qk-success);">Score: 88 · MTR</p>
+          </div>
+          <div class="stat-card rounded-xl p-4 border" style="background: var(--qk-surface); border-color: var(--qk-border);">
+            <p class="text-xs font-medium mb-1" style="color: var(--qk-muted);">Analyses This Month</p>
+            <p class="text-3xl font-bold font-mono" style="color: var(--qk-text);">3</p>
+            <p class="text-xs mt-1" style="color: var(--qk-muted);">11 remaining on Pro</p>
+          </div>
+        </div>
+
+        <!-- Recent Analyses table -->
+        <div class="rounded-xl border overflow-hidden" style="border-color: var(--qk-border);">
+          <div class="flex items-center justify-between px-5 py-4 border-b" style="border-color: var(--qk-border); background: var(--qk-surface);">
+            <h2 class="text-sm font-semibold" style="color: var(--qk-text);">Recent Analyses</h2>
+            <span class="text-xs" style="color: var(--qk-muted);">Last 30 days</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" style="background: var(--qk-surface);">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--qk-border);">
+                  <th class="text-left px-5 py-3 text-xs font-semibold" style="color: var(--qk-muted);">Address</th>
+                  <th class="text-left px-4 py-3 text-xs font-semibold" style="color: var(--qk-muted);">Strategy</th>
+                  <th class="text-left px-4 py-3 text-xs font-semibold" style="color: var(--qk-muted);">Score</th>
+                  <th class="text-left px-4 py-3 text-xs font-semibold" style="color: var(--qk-muted);">Status</th>
+                  <th class="text-left px-4 py-3 text-xs font-semibold" style="color: var(--qk-muted);">Date</th>
+                  <th class="px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="trow border-b transition-colors" style="border-color: var(--qk-border);">
+                  <td class="px-5 py-3.5 transition-colors" style="color: var(--qk-text);">
+                    <p class="font-medium">812 Birchwood Ave</p>
+                    <p class="text-xs" style="color: var(--qk-muted);">Little Rock, AR</p>
+                  </td>
+                  <td class="px-4 py-3.5"><span class="px-2 py-0.5 rounded-full text-xs font-medium" style="background: rgba(245,158,11,0.12); color: #F59E0B;">MTR</span></td>
+                  <td class="px-4 py-3.5"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono score-high">88</span></td>
+                  <td class="px-4 py-3.5"><span class="px-2 py-0.5 rounded-full text-xs font-medium" style="background: rgba(16,185,129,0.12); color: #10B981;">Complete</span></td>
+                  <td class="px-4 py-3.5 text-xs font-mono" style="color: var(--qk-muted);">Apr 07</td>
+                  <td class="px-4 py-3.5">
+                    <button onclick="showAppView('analysis')" class="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors hover:opacity-80" style="background: var(--qk-s2); color: var(--qk-accent);">View</button>
+                  </td>
+                </tr>
+                <tr class="trow border-b transition-colors" style="border-color: var(--qk-border);">
+                  <td class="px-5 py-3.5 transition-colors" style="color: var(--qk-text);">
+                    <p class="font-medium">7704 Ridgeline Ct</p>
+                    <p class="text-xs" style="color: var(--qk-muted);">Fayetteville, AR</p>
+                  </td>
+                  <td class="px-4 py-3.5"><span class="px-2 py-0.5 rounded-full text-xs font-medium" style="background: rgba(16,185,129,0.12); color: #10B981;">LTR</span></td>
+                  <td class="px-4 py-3.5"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono score-mid">79</span></td>
+                  <td class="px-4 py-3.5"><span class="px-2 py-0.5 rounded-full text-xs font-medium" style="background: rgba(16,185,129,0.12); color: #10B981;">Complete</span></td>
+                  <td class="px-4 py-3.5 text-xs font-mono" style="color: var(--qk-muted);">Apr 05</td>
+                  <td class="px-4 py-3.5"><button class="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors hover:opacity-80" style="background: var(--qk-s2); color: var(--qk-accent);">View</button></td>
+                </tr>
+                <tr class="trow border-b transition-colors" style="border-color: var(--qk-border);">
+                  <td class="px-5 py-3.5 transition-colors" style="color: var(--qk-text);">
+                    <p class="font-medium">4218 Cedar Falls Rd</p>
+                    <p class="text-xs" style="color: var(--qk-muted);">Memphis, TN</p>
+                  </td>
+                  <td class="px-4 py-3.5"><span class="px-2 py-0.5 rounded-full text-xs font-medium" style="background: rgba(16,185,129,0.12); color: #10B981;">LTR</span></td>
+                  <td class="px-4 py-3.5"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono score-mid">74</span></td>
+                  <td class="px-4 py-3.5"><span class="px-2 py-0.5 rounded-full text-xs font-medium" style="background: rgba(16,185,129,0.12); color: #10B981;">Complete</span></td>
+                  <td class="px-4 py-3.5 text-xs font-mono" style="color: var(--qk-muted);">Mar 29</td>
+                  <td class="px-4 py-3.5"><button class="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors hover:opacity-80" style="background: var(--qk-s2); color: var(--qk-accent);">View</button></td>
+                </tr>
+                <tr class="trow transition-colors">
+                  <td class="px-5 py-3.5 transition-colors" style="color: var(--qk-text);">
+                    <p class="font-medium">3301 Lake Shore Dr</p>
+                    <p class="text-xs" style="color: var(--qk-muted);">Minneapolis, MN</p>
+                  </td>
+                  <td class="px-4 py-3.5"><span class="px-2 py-0.5 rounded-full text-xs font-medium" style="background: rgba(255,87,87,0.12); color: #FF5757;">STR</span></td>
+                  <td class="px-4 py-3.5"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono score-low">61</span></td>
+                  <td class="px-4 py-3.5"><span class="px-2 py-0.5 rounded-full text-xs font-medium" style="background: rgba(245,158,11,0.12); color: #F59E0B;">Flagged</span></td>
+                  <td class="px-4 py-3.5 text-xs font-mono" style="color: var(--qk-muted);">Mar 22</td>
+                  <td class="px-4 py-3.5"><button class="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors hover:opacity-80" style="background: var(--qk-s2); color: var(--qk-accent);">View</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end dashboard view -->
+
+    <!-- ════ ANALYSIS VIEW ════ -->
+    <div id="view-analysis" class="app-view hidden flex flex-col" style="min-height:100vh;">
+
+      <!-- Top bar -->
+      <div class="sticky top-0 z-20 border-b px-5 py-3 flex flex-wrap items-center gap-3"
+           style="background: var(--qk-surface); border-color: var(--qk-border);">
+        <!-- Address input -->
+        <div class="flex items-center gap-2 flex-1 min-w-0">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="w-4 h-4 flex-shrink-0" style="color:var(--qk-muted)"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <input id="analysis-address" type="text" value="812 Birchwood Ave, Little Rock, AR 72205"
+                 class="flex-1 bg-transparent text-sm font-medium outline-none min-w-0"
+                 style="color: var(--qk-text);" />
+        </div>
+        <!-- Strategy toggle -->
+        <div class="flex items-center gap-1 rounded-lg p-1" style="background:var(--qk-s2);">
+          <span onclick="setStrategy('STR',this)" class="strat-tab">STR</span>
+          <span onclick="setStrategy('MTR',this)" class="strat-tab active">MTR</span>
+          <span onclick="setStrategy('LTR',this)" class="strat-tab">LTR</span>
+        </div>
+        <!-- Run / Export buttons -->
+        <button id="run-btn" onclick="runAnalysis()"
+                class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 flex-shrink-0"
+                style="background:var(--qk-accent);">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Run Analysis
+        </button>
+        <button id="export-btn" onclick="window.print()"
+                class="hidden items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-90 flex-shrink-0"
+                style="background:var(--qk-s2); color:var(--qk-text); border:1px solid var(--qk-border);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="w-3.5 h-3.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export Memo
+        </button>
+      </div>
+
+      <!-- Body: stepper + main panel -->
+      <div class="flex flex-1 overflow-hidden">
+
+        <!-- Left rail — agent stepper -->
+        <aside class="hidden md:flex flex-col w-48 flex-shrink-0 border-r py-4 px-2 gap-1 overflow-y-auto"
+               style="background:var(--qk-surface); border-color:var(--qk-border);">
+          <p class="text-xs font-semibold px-3 mb-2" style="color:var(--qk-muted);">AGENTS</p>
+
+          <div id="agent-avery"  class="agent-row active-agent" onclick="setActiveAgent('avery')">
+            <div id="dot-avery"  class="agent-dot w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:var(--qk-border);"></div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold leading-tight" style="color:var(--qk-text);">Avery</p>
+              <p class="text-xs" style="color:var(--qk-muted);">Intake</p>
+            </div>
+            <div id="badge-avery" class="ml-auto text-xs font-medium px-1.5 py-0.5 rounded-md flex-shrink-0" style="background:var(--qk-s2);color:var(--qk-muted);">—</div>
+          </div>
+
+          <div id="agent-rex"    class="agent-row" onclick="setActiveAgent('rex')">
+            <div id="dot-rex"    class="agent-dot w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:var(--qk-border);"></div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold leading-tight" style="color:var(--qk-text);">Rex</p>
+              <p class="text-xs" style="color:var(--qk-muted);">Comps</p>
+            </div>
+            <div id="badge-rex"  class="ml-auto text-xs font-medium px-1.5 py-0.5 rounded-md flex-shrink-0" style="background:var(--qk-s2);color:var(--qk-muted);">—</div>
+          </div>
+
+          <div id="agent-rhea"   class="agent-row" onclick="setActiveAgent('rhea')">
+            <div id="dot-rhea"   class="agent-dot w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:var(--qk-border);"></div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold leading-tight" style="color:var(--qk-text);">Rhea</p>
+              <p class="text-xs" style="color:var(--qk-muted);">Revenue</p>
+            </div>
+            <div id="badge-rhea" class="ml-auto text-xs font-medium px-1.5 py-0.5 rounded-md flex-shrink-0" style="background:var(--qk-s2);color:var(--qk-muted);">—</div>
+          </div>
+
+          <div id="agent-sloane" class="agent-row" onclick="setActiveAgent('sloane')">
+            <div id="dot-sloane" class="agent-dot w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:var(--qk-border);"></div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold leading-tight" style="color:var(--qk-text);">Sloane</p>
+              <p class="text-xs" style="color:var(--qk-muted);">Expenses</p>
+            </div>
+            <div id="badge-sloane" class="ml-auto text-xs font-medium px-1.5 py-0.5 rounded-md flex-shrink-0" style="background:var(--qk-s2);color:var(--qk-muted);">—</div>
+          </div>
+
+          <div id="agent-uri"    class="agent-row" onclick="setActiveAgent('uri')">
+            <div id="dot-uri"    class="agent-dot w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:var(--qk-border);"></div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold leading-tight" style="color:var(--qk-text);">Uri</p>
+              <p class="text-xs" style="color:var(--qk-muted);">Financing</p>
+            </div>
+            <div id="badge-uri"  class="ml-auto text-xs font-medium px-1.5 py-0.5 rounded-md flex-shrink-0" style="background:var(--qk-s2);color:var(--qk-muted);">—</div>
+          </div>
+
+          <div id="agent-pax"    class="agent-row" onclick="setActiveAgent('pax')">
+            <div id="dot-pax"    class="agent-dot w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:var(--qk-border);"></div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold leading-tight" style="color:var(--qk-text);">Pax</p>
+              <p class="text-xs" style="color:var(--qk-muted);">Score</p>
+            </div>
+            <div id="badge-pax"  class="ml-auto text-xs font-medium px-1.5 py-0.5 rounded-md flex-shrink-0" style="background:var(--qk-s2);color:var(--qk-muted);">—</div>
+          </div>
+        </aside>
+
+        <!-- Main panel -->
+        <div class="flex-1 overflow-y-auto p-5 md:p-6 space-y-4">
+
+          <!-- Empty state (shown before run) -->
+          <div id="analysis-empty" class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style="background:rgba(255,87,87,0.1);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FF5757" stroke-width="1.8" stroke-linecap="round" class="w-8 h-8"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <h3 class="text-base font-semibold mb-1" style="color:var(--qk-text);">Ready to analyze</h3>
+            <p class="text-sm" style="color:var(--qk-muted);">Enter an address above and click Run Analysis to start the 6-agent underwriting sequence.</p>
+          </div>
+
+          <!-- Agent output cards (populated by JS) -->
+          <div id="output-avery"  class="agent-output hidden"></div>
+          <div id="output-rex"    class="agent-output hidden"></div>
+          <div id="output-rhea"   class="agent-output hidden"></div>
+          <div id="output-sloane" class="agent-output hidden"></div>
+          <div id="output-uri"    class="agent-output hidden"></div>
+          <div id="output-pax"    class="agent-output hidden"></div>
+
+        </div>
+      </div>
+    </div>
+    <!-- end analysis view -->
+
+    <!-- ════ SETTINGS VIEW ════ -->
+    <div id="view-settings" class="app-view hidden">
+
+      <!-- Header -->
+      <div class="sticky top-0 z-20 border-b px-6 py-4" style="background:var(--qk-surface);border-color:var(--qk-border);">
+        <h1 class="text-xl font-bold" style="color:var(--qk-text);">Settings</h1>
+        <p class="text-sm" style="color:var(--qk-muted);">Manage your account, plan, and preferences.</p>
+      </div>
+
+      <!-- Tab bar -->
+      <div class="border-b px-6 flex gap-1 overflow-x-auto" style="background:var(--qk-surface);border-color:var(--qk-border);">
+        <button onclick="showSettingsTab('account')"      id="stab-account"       class="settings-tab px-4 py-3 text-sm font-semibold border-b-2 -mb-px transition-colors whitespace-nowrap" style="border-color:var(--qk-accent);color:var(--qk-accent);">Account</button>
+        <button onclick="showSettingsTab('subscription')" id="stab-subscription"  class="settings-tab px-4 py-3 text-sm font-semibold border-b-2 -mb-px transition-colors whitespace-nowrap" style="border-color:transparent;color:var(--qk-muted);">Subscription</button>
+        <button onclick="showSettingsTab('notifications')" id="stab-notifications" class="settings-tab px-4 py-3 text-sm font-semibold border-b-2 -mb-px transition-colors whitespace-nowrap" style="border-color:transparent;color:var(--qk-muted);">Notifications</button>
+        <button onclick="showSettingsTab('integrations')" id="stab-integrations"  class="settings-tab px-4 py-3 text-sm font-semibold border-b-2 -mb-px transition-colors whitespace-nowrap" style="border-color:transparent;color:var(--qk-muted);">Integrations</button>
+      </div>
+
+      <!-- Tab content -->
+      <div class="px-6 py-6 max-w-2xl">
+
+        <!-- ── Account ── -->
+        <div id="stab-content-account" class="settings-content space-y-6">
+          <!-- Avatar -->
+          <div class="flex items-center gap-4">
+            <div class="relative">
+              <img src="https://placehold.co/64x64/FEDDDA/FF5757?text=AM" class="w-16 h-16 rounded-full" alt="avatar" />
+              <button class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center" style="background:var(--qk-accent);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" class="w-3 h-3"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </button>
+            </div>
+            <div>
+              <p class="text-sm font-semibold" style="color:var(--qk-text);">Alex Merritt</p>
+              <button class="text-xs underline underline-offset-2 transition-opacity hover:opacity-70" style="color:var(--qk-accent);">Change photo</button>
+            </div>
+          </div>
+
+          <!-- Fields -->
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium mb-1.5" style="color:var(--qk-muted);">Full name</label>
+                <input type="text" value="Alex Merritt"
+                       class="w-full px-4 py-2.5 rounded-xl text-sm outline-none transition-all"
+                       style="background:var(--qk-s2);border:1px solid var(--qk-border);color:var(--qk-text);"
+                       onfocus="this.style.borderColor='var(--qk-accent)'" onblur="this.style.borderColor='var(--qk-border)'" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1.5" style="color:var(--qk-muted);">Email address</label>
+                <input type="email" value="alex@questkey.com"
+                       class="w-full px-4 py-2.5 rounded-xl text-sm outline-none transition-all"
+                       style="background:var(--qk-s2);border:1px solid var(--qk-border);color:var(--qk-text);"
+                       onfocus="this.style.borderColor='var(--qk-accent)'" onblur="this.style.borderColor='var(--qk-border)'" />
+              </div>
+            </div>
+
+            <!-- Password change -->
+            <div class="pt-2 border-t" style="border-color:var(--qk-border);">
+              <p class="text-sm font-semibold mb-3" style="color:var(--qk-text);">Change password</p>
+              <div class="space-y-3">
+                <input type="password" placeholder="Current password"
+                       class="w-full px-4 py-2.5 rounded-xl text-sm outline-none transition-all"
+                       style="background:var(--qk-s2);border:1px solid var(--qk-border);color:var(--qk-text);"
+                       onfocus="this.style.borderColor='var(--qk-accent)'" onblur="this.style.borderColor='var(--qk-border)'" />
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input type="password" placeholder="New password"
+                         class="w-full px-4 py-2.5 rounded-xl text-sm outline-none transition-all"
+                         style="background:var(--qk-s2);border:1px solid var(--qk-border);color:var(--qk-text);"
+                         onfocus="this.style.borderColor='var(--qk-accent)'" onblur="this.style.borderColor='var(--qk-border)'" />
+                  <input type="password" placeholder="Confirm new password"
+                         class="w-full px-4 py-2.5 rounded-xl text-sm outline-none transition-all"
+                         style="background:var(--qk-s2);border:1px solid var(--qk-border);color:var(--qk-text);"
+                         onfocus="this.style.borderColor='var(--qk-accent)'" onblur="this.style.borderColor='var(--qk-border)'" />
+                </div>
+              </div>
+            </div>
+
+            <button class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95" style="background:var(--qk-accent);">Save Changes</button>
+          </div>
+        </div>
+
+        <!-- ── Subscription ── -->
+        <div id="stab-content-subscription" class="settings-content hidden space-y-5">
+          <!-- Current plan -->
+          <div class="rounded-xl border p-5" style="background:var(--qk-s2);border-color:var(--qk-border);">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-base font-bold" style="color:var(--qk-text);">Pro Plan</span>
+                  <span class="px-2 py-0.5 rounded-full text-xs font-semibold" style="background:rgba(255,87,87,0.12);color:var(--qk-accent);">Current</span>
+                </div>
+                <p class="text-sm" style="color:var(--qk-muted);">14 analyses/mo · Priority support · CSV export</p>
+              </div>
+              <p class="text-xl font-bold font-mono" style="color:var(--qk-text);">$49<span class="text-sm font-normal" style="color:var(--qk-muted);">/mo</span></p>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--qk-border);">
+              <p class="text-xs" style="color:var(--qk-muted);">Renews May 9, 2026 · Visa ····4242</p>
+              <button class="text-xs font-medium underline underline-offset-2 hover:opacity-70 transition-opacity" style="color:var(--qk-muted);">Cancel plan</button>
+            </div>
+          </div>
+
+          <!-- Upgrade CTA -->
+          <div class="rounded-xl border p-5 relative overflow-hidden" style="border-color:rgba(255,87,87,0.3);background:rgba(255,87,87,0.04);">
+            <div class="absolute top-0 right-0 w-32 h-32 rounded-full opacity-5" style="background:var(--qk-accent);transform:translate(30%,-30%);"></div>
+            <div class="flex items-start justify-between mb-2">
+              <div>
+                <p class="text-base font-bold mb-1" style="color:var(--qk-text);">Unlimited Plan</p>
+                <p class="text-sm" style="color:var(--qk-muted);">Unlimited analyses · Team seats · API access · White-label reports</p>
+              </div>
+              <p class="text-xl font-bold font-mono flex-shrink-0 ml-4" style="color:var(--qk-text);">$99<span class="text-sm font-normal" style="color:var(--qk-muted);">/mo</span></p>
+            </div>
+            <button class="mt-3 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95" style="background:var(--qk-accent);">Upgrade to Unlimited →</button>
+          </div>
+
+          <!-- Billing history -->
+          <div>
+            <p class="text-sm font-semibold mb-3" style="color:var(--qk-text);">Billing History</p>
+            <div class="rounded-xl border overflow-hidden" style="border-color:var(--qk-border);">
+              <table class="w-full text-sm" style="background:var(--qk-surface);">
+                <thead><tr style="border-bottom:1px solid var(--qk-border);">
+                  <th class="text-left px-4 py-2.5 text-xs font-semibold" style="color:var(--qk-muted);">Date</th>
+                  <th class="text-left px-4 py-2.5 text-xs font-semibold" style="color:var(--qk-muted);">Description</th>
+                  <th class="text-right px-4 py-2.5 text-xs font-semibold" style="color:var(--qk-muted);">Amount</th>
+                  <th class="text-right px-4 py-2.5 text-xs font-semibold" style="color:var(--qk-muted);">Status</th>
+                </tr></thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid var(--qk-border);">
+                    <td class="px-4 py-3 text-xs font-mono" style="color:var(--qk-muted);">Apr 9, 2026</td>
+                    <td class="px-4 py-3 text-xs" style="color:var(--qk-text);">Pro Plan</td>
+                    <td class="px-4 py-3 text-xs font-mono text-right" style="color:var(--qk-text);">$49.00</td>
+                    <td class="px-4 py-3 text-right"><span class="text-xs font-medium px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.12);color:#10B981;">Paid</span></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid var(--qk-border);">
+                    <td class="px-4 py-3 text-xs font-mono" style="color:var(--qk-muted);">Mar 9, 2026</td>
+                    <td class="px-4 py-3 text-xs" style="color:var(--qk-text);">Pro Plan</td>
+                    <td class="px-4 py-3 text-xs font-mono text-right" style="color:var(--qk-text);">$49.00</td>
+                    <td class="px-4 py-3 text-right"><span class="text-xs font-medium px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.12);color:#10B981;">Paid</span></td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-xs font-mono" style="color:var(--qk-muted);">Feb 9, 2026</td>
+                    <td class="px-4 py-3 text-xs" style="color:var(--qk-text);">Pro Plan</td>
+                    <td class="px-4 py-3 text-xs font-mono text-right" style="color:var(--qk-text);">$49.00</td>
+                    <td class="px-4 py-3 text-right"><span class="text-xs font-medium px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.12);color:#10B981;">Paid</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Notifications ── -->
+        <div id="stab-content-notifications" class="settings-content hidden space-y-2">
+          <p class="text-xs font-semibold mb-4 pb-2 border-b" style="color:var(--qk-muted);border-color:var(--qk-border);">ANALYSIS ALERTS</p>
+          <div class="flex items-center justify-between py-3 border-b" style="border-color:var(--qk-border);">
+            <div><p class="text-sm font-medium" style="color:var(--qk-text);">Analysis complete</p><p class="text-xs" style="color:var(--qk-muted);">Email</p></div>
+            <div class="toggle-switch" data-on="true" onclick="toggleSwitch(this)" style="background:var(--qk-accent);">
+              <div class="toggle-thumb" style="transform:translateX(20px);"></div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between py-3 border-b" style="border-color:var(--qk-border);">
+            <div><p class="text-sm font-medium" style="color:var(--qk-text);">Analysis complete</p><p class="text-xs" style="color:var(--qk-muted);">In-app</p></div>
+            <div class="toggle-switch" data-on="true" onclick="toggleSwitch(this)" style="background:var(--qk-accent);">
+              <div class="toggle-thumb" style="transform:translateX(20px);"></div>
+            </div>
+          </div>
+          <p class="text-xs font-semibold mt-4 mb-2 pt-4 pb-2 border-b" style="color:var(--qk-muted);border-color:var(--qk-border);">SCORE ALERTS</p>
+          <div class="flex items-center justify-between py-3 border-b" style="border-color:var(--qk-border);">
+            <div><p class="text-sm font-medium" style="color:var(--qk-text);">Score threshold crossed</p><p class="text-xs" style="color:var(--qk-muted);">Email — notify when score ≥ 80</p></div>
+            <div class="toggle-switch" data-on="true" onclick="toggleSwitch(this)" style="background:var(--qk-accent);">
+              <div class="toggle-thumb" style="transform:translateX(20px);"></div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between py-3 border-b" style="border-color:var(--qk-border);">
+            <div><p class="text-sm font-medium" style="color:var(--qk-text);">Score threshold crossed</p><p class="text-xs" style="color:var(--qk-muted);">In-app</p></div>
+            <div class="toggle-switch" data-on="true" onclick="toggleSwitch(this)" style="background:var(--qk-accent);">
+              <div class="toggle-thumb" style="transform:translateX(20px);"></div>
+            </div>
+          </div>
+          <p class="text-xs font-semibold mt-4 mb-2 pt-4 pb-2 border-b" style="color:var(--qk-muted);border-color:var(--qk-border);">REPORTS & BILLING</p>
+          <div class="flex items-center justify-between py-3 border-b" style="border-color:var(--qk-border);">
+            <div><p class="text-sm font-medium" style="color:var(--qk-text);">Weekly portfolio report</p><p class="text-xs" style="color:var(--qk-muted);">Email — every Monday</p></div>
+            <div class="toggle-switch" data-on="false" onclick="toggleSwitch(this)" style="background:var(--qk-border);">
+              <div class="toggle-thumb" style="transform:translateX(0);"></div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between py-3">
+            <div><p class="text-sm font-medium" style="color:var(--qk-text);">Billing & system updates</p><p class="text-xs" style="color:var(--qk-muted);">Email</p></div>
+            <div class="toggle-switch" data-on="true" onclick="toggleSwitch(this)" style="background:var(--qk-accent);">
+              <div class="toggle-thumb" style="transform:translateX(20px);"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Integrations ── -->
+        <div id="stab-content-integrations" class="settings-content hidden space-y-3">
+          <!-- Zillow -->
+          <div class="flex items-center gap-4 rounded-xl border p-4" style="background:var(--qk-surface);border-color:var(--qk-border);">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0" style="background:#006AFF20;color:#006AFF;">Z</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5">
+                <p class="text-sm font-semibold" style="color:var(--qk-text);">Zillow</p>
+                <span class="text-xs font-medium px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.12);color:#10B981;">Connected</span>
+              </div>
+              <p class="text-xs" style="color:var(--qk-muted);">Market trends, listing data, Zestimates</p>
+            </div>
+            <button class="text-xs font-medium px-3 py-1.5 rounded-lg flex-shrink-0 transition-colors hover:opacity-80" style="background:var(--qk-s2);color:var(--qk-muted);">Disconnect</button>
+          </div>
+          <!-- CoStar -->
+          <div class="flex items-center gap-4 rounded-xl border p-4" style="background:var(--qk-surface);border-color:var(--qk-border);">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0" style="background:#FF6B0020;color:#FF6B00;">CS</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5">
+                <p class="text-sm font-semibold" style="color:var(--qk-text);">CoStar</p>
+                <span class="text-xs font-medium px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.12);color:#10B981;">Connected</span>
+              </div>
+              <p class="text-xs" style="color:var(--qk-muted);">Commercial comps, vacancy data, cap rate benchmarks</p>
+            </div>
+            <button class="text-xs font-medium px-3 py-1.5 rounded-lg flex-shrink-0 transition-colors hover:opacity-80" style="background:var(--qk-s2);color:var(--qk-muted);">Disconnect</button>
+          </div>
+          <!-- AirDNA -->
+          <div class="flex items-center gap-4 rounded-xl border p-4" style="background:var(--qk-surface);border-color:var(--qk-border);">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0" style="background:#FF5A5F20;color:#FF5A5F;">AD</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5">
+                <p class="text-sm font-semibold" style="color:var(--qk-text);">AirDNA</p>
+                <span class="text-xs font-medium px-2 py-0.5 rounded-full" style="background:var(--qk-s2);color:var(--qk-muted);">Not Connected</span>
+              </div>
+              <p class="text-xs" style="color:var(--qk-muted);">STR occupancy, ADR, and revenue data by market</p>
+            </div>
+            <button class="text-xs font-medium px-3 py-1.5 rounded-lg flex-shrink-0 transition-colors hover:opacity-90 text-white" style="background:var(--qk-accent);">Connect</button>
+          </div>
+          <!-- MLS Direct -->
+          <div class="flex items-center gap-4 rounded-xl border p-4" style="background:var(--qk-surface);border-color:var(--qk-border);">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0" style="background:#10B98120;color:#10B981;">MLS</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5">
+                <p class="text-sm font-semibold" style="color:var(--qk-text);">MLS Direct</p>
+                <span class="text-xs font-medium px-2 py-0.5 rounded-full" style="background:var(--qk-s2);color:var(--qk-muted);">Not Connected</span>
+              </div>
+              <p class="text-xs" style="color:var(--qk-muted);">Real-time listing feed, sold comps, DOM data</p>
+            </div>
+            <button class="text-xs font-medium px-3 py-1.5 rounded-lg flex-shrink-0 transition-colors hover:opacity-90 text-white" style="background:var(--qk-accent);">Connect</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- end settings view -->
+
+  </main>
+
+  <!-- ── Mobile Bottom Nav ── -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 border-t z-30 flex"
+       style="background: var(--qk-surface); border-color: var(--qk-border);">
+    <button onclick="showAppView('dashboard')" id="mob-dashboard" class="flex-1 flex flex-col items-center gap-1 py-3 transition-colors" style="color: var(--qk-accent);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="w-5 h-5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="text-xs font-medium">Home</span>
+    </button>
+    <button onclick="showAppView('analysis')" id="mob-analysis" class="flex-1 flex flex-col items-center gap-1 py-3 transition-colors" style="color: var(--qk-muted);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="w-5 h-5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span class="text-xs font-medium">Analyze</span>
+    </button>
+    <button onclick="showAppView('settings')" id="mob-settings" class="flex-1 flex flex-col items-center gap-1 py-3 transition-colors" style="color: var(--qk-muted);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="w-5 h-5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="text-xs font-medium">Settings</span>
+    </button>
+  </nav>
+
+</div><!-- end app-shell -->
+
+
+<script>
+  // ── Wizard state ──────────────────────────────
+  let currentStep = 1;
+  const TOTAL_STEPS = 6;
+
+  function goToStep(n) {
+    const prev = document.getElementById('step-' + currentStep);
+    const next = document.getElementById('step-' + n);
+    if (!next) return;
+
+    if (n > currentStep) {
+      prev.classList.remove('active');
+      prev.classList.add('prev');
+      next.style.transform = 'translateX(100%)';
+      next.style.opacity = '0';
+      next.classList.add('active');
+      requestAnimationFrame(() => {
+        next.style.transform = '';
+        next.style.opacity = '';
+      });
+    } else {
+      prev.classList.remove('active');
+      next.classList.remove('prev');
+      next.classList.add('active');
+    }
+
+    currentStep = n;
+    updateProgress();
+    updateNav();
+    if (n === 6) triggerDoneAnimation();
+  }
+
+  function nextStep() {
+    // Validate step 2 before advancing
+    if (currentStep === 2) {
+      const name  = document.getElementById('acct-name').value.trim();
+      const email = document.getElementById('acct-email').value.trim();
+      const pass  = document.getElementById('acct-password').value;
+      const err   = document.getElementById('acct-error');
+      if (!name || !email || pass.length < 8) {
+        err.textContent = !name ? 'Please enter your name.' :
+                          !email ? 'Please enter your email.' :
+                          'Password must be at least 8 characters.';
+        err.classList.remove('hidden');
+        return;
+      }
+      err.classList.add('hidden');
+    }
+    if (currentStep === 3) {
+      if (!selectedStrategy) {
+        document.getElementById('strat-error').classList.remove('hidden');
+        return;
+      }
+    }
+    if (currentStep === 4) {
+      if (selectedMarkets.size === 0) {
+        document.getElementById('market-error').classList.remove('hidden');
+        return;
+      }
+    }
+    if (currentStep < TOTAL_STEPS) goToStep(currentStep + 1);
+    else goToDashboard();
+  }
+
+  // ── File / CSV upload ─────────────────────────
+  function handleDragOver(e) {
+    e.preventDefault();
+    const dz = document.getElementById('drop-zone');
+    dz.style.borderColor = 'var(--qk-accent)';
+    dz.style.background  = 'rgba(255,87,87,0.05)';
+  }
+  function handleDragLeave(e) {
+    const dz = document.getElementById('drop-zone');
+    dz.style.borderColor = 'var(--qk-border)';
+    dz.style.background  = 'var(--qk-s2)';
+  }
+  function handleDrop(e) {
+    e.preventDefault();
+    handleDragLeave(e);
+    const file = e.dataTransfer.files[0];
+    if (file) showFile(file.name);
+  }
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) showFile(file.name);
+  }
+  function showFile(name) {
+    document.getElementById('file-name').textContent = name;
+    document.getElementById('file-selected').classList.remove('hidden');
+    document.getElementById('drop-zone').style.opacity = '0.5';
+  }
+  function clearFile(e) {
+    e.stopPropagation();
+    document.getElementById('file-selected').classList.add('hidden');
+    document.getElementById('drop-zone').style.opacity = '1';
+    document.getElementById('csv-input').value = '';
+  }
+
+  // ── Market selection ──────────────────────────
+  const selectedMarkets = new Set();
+
+  function toggleMarket(market, el) {
+    const check = el.querySelector('.market-check');
+    if (selectedMarkets.has(market)) {
+      selectedMarkets.delete(market);
+      el.style.borderColor = 'var(--qk-border)';
+      el.style.background  = 'var(--qk-s2)';
+      check.style.background   = 'transparent';
+      check.style.borderColor  = 'var(--qk-border)';
+      check.innerHTML = '';
+    } else {
+      selectedMarkets.add(market);
+      el.style.borderColor = 'var(--qk-accent)';
+      el.style.background  = 'rgba(255,87,87,0.06)';
+      check.style.background  = 'var(--qk-accent)';
+      check.style.borderColor = 'var(--qk-accent)';
+      check.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" class="w-2.5 h-2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+    }
+    document.getElementById('market-count').textContent = selectedMarkets.size;
+    if (selectedMarkets.size > 0) document.getElementById('market-error').classList.add('hidden');
+  }
+
+  // ── Strategy selection ────────────────────────
+  let selectedStrategy = null;
+
+  function selectStrategy(strategy) {
+    selectedStrategy = strategy;
+    document.querySelectorAll('.strategy-card').forEach(card => {
+      card.style.borderColor = 'var(--qk-border)';
+      card.style.background  = 'var(--qk-s2)';
+    });
+    const el = document.getElementById('strat-' + strategy);
+    el.style.borderColor = 'var(--qk-accent)';
+    el.style.background  = 'rgba(255,87,87,0.06)';
+    document.getElementById('strat-error').classList.add('hidden');
+  }
+
+  function togglePasswordVisibility() {
+    const input = document.getElementById('acct-password');
+    const icon  = document.getElementById('eye-icon');
+    const show  = input.type === 'password';
+    input.type  = show ? 'text' : 'password';
+    icon.innerHTML = show
+      ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+      : '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>';
+  }
+
+  function prevStep() {
+    if (currentStep > 1) goToStep(currentStep - 1);
+  }
+
+  function updateProgress() {
+    const pct = Math.round((currentStep / TOTAL_STEPS) * 100);
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('step-label').textContent = 'Step ' + currentStep + ' of ' + TOTAL_STEPS;
+    document.getElementById('step-pct').textContent = pct + '%';
+  }
+
+  function updateNav() {
+    const nav = document.getElementById('wizard-nav');
+    nav.classList.toggle('hidden', currentStep === 1 || currentStep === 6);
+  }
+
+  function triggerDoneAnimation() {
+    // Update summary pills
+    if (selectedStrategy) {
+      const labels = { STR: 'STR', MTR: 'MTR', LTR: 'LTR', ALL: 'All Three' };
+      document.getElementById('done-strategy-pill').textContent = labels[selectedStrategy] || selectedStrategy;
+    }
+    const mc = selectedMarkets.size;
+    document.getElementById('done-markets-pill').textContent = mc + (mc === 1 ? ' market' : ' markets');
+
+    // Animate circle then checkmark
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        document.getElementById('done-circle').style.strokeDashoffset = '0';
+        document.getElementById('done-check').style.strokeDashoffset  = '0';
+      }, 80);
+    });
+  }
+
+  function goToDashboard() {
+    document.getElementById('onboarding').classList.add('hidden');
+    document.getElementById('app-shell').classList.remove('hidden');
+    showAppView('dashboard');
+  }
+
+  // ── Analysis ──────────────────────────────────
+  const AGENTS = ['avery','rex','rhea','sloane','uri','pax'];
+  let analysisRunning = false;
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  function setStrategy(s, el) {
+    document.querySelectorAll('.strat-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function setActiveAgent(id) {
+    AGENTS.forEach(a => document.getElementById('agent-' + a).classList.remove('active-agent'));
+    document.getElementById('agent-' + id).classList.add('active-agent');
+    // Show this agent's output if it exists
+    AGENTS.forEach(a => {
+      const el = document.getElementById('output-' + a);
+      if (el && !el.classList.contains('hidden')) el.style.opacity = a === id ? '1' : '0.4';
+    });
+  }
+
+  function setAgentStatus(id, status) {
+    const dot   = document.getElementById('dot-' + id);
+    const badge = document.getElementById('badge-' + id);
+    if (status === 'running') {
+      dot.style.background = 'var(--qk-accent)';
+      dot.classList.add('agent-running');
+      badge.textContent = 'Running';
+      badge.style.background = 'rgba(255,87,87,0.12)';
+      badge.style.color = 'var(--qk-accent)';
+    } else if (status === 'complete') {
+      dot.classList.remove('agent-running');
+      dot.style.background = 'var(--qk-success)';
+      dot.style.boxShadow = 'none';
+      badge.textContent = 'Done';
+      badge.style.background = 'rgba(16,185,129,0.12)';
+      badge.style.color = 'var(--qk-success)';
+    } else if (status === 'flagged') {
+      dot.classList.remove('agent-running');
+      dot.style.background = 'var(--qk-warning)';
+      badge.textContent = 'Flag';
+      badge.style.background = 'rgba(245,158,11,0.12)';
+      badge.style.color = 'var(--qk-warning)';
+    }
+  }
+
+  function renderAgentOutput(id) {
+    const el = document.getElementById('output-' + id);
+    el.innerHTML = AGENT_OUTPUTS[id];
+    el.classList.remove('hidden');
+    el.style.opacity = '1';
+    setActiveAgent(id);
+  }
+
+  function animateGauge(score) {
+    const circumference = 339.29;
+    const offset = circumference - (score / 100) * circumference;
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        document.getElementById('gauge-ring').style.strokeDashoffset = offset;
+        document.getElementById('gauge-score').textContent = score;
+      }, 50);
+    });
+  }
+
+  async function runAnalysis() {
+    if (analysisRunning) return;
+    analysisRunning = true;
+    document.getElementById('analysis-empty').classList.add('hidden');
+    document.getElementById('run-btn').disabled = true;
+    document.getElementById('run-btn').style.opacity = '0.5';
+    // Reset all agents
+    AGENTS.forEach(a => {
+      const dot = document.getElementById('dot-' + a);
+      dot.classList.remove('agent-running');
+      dot.style.background = 'var(--qk-border)';
+      dot.style.boxShadow = 'none';
+      const badge = document.getElementById('badge-' + a);
+      badge.textContent = '—';
+      badge.style.background = 'var(--qk-s2)';
+      badge.style.color = 'var(--qk-muted)';
+      document.getElementById('output-' + a).classList.add('hidden');
+    });
+    for (const id of AGENTS) {
+      setAgentStatus(id, 'running');
+      setActiveAgent(id);
+      await sleep(1300 + Math.random() * 700);
+      setAgentStatus(id, 'complete');
+      renderAgentOutput(id);
+    }
+    setTimeout(() => animateGauge(88), 150);
+    const expBtn = document.getElementById('export-btn');
+    expBtn.classList.remove('hidden');
+    expBtn.classList.add('flex');
+    document.getElementById('run-btn').disabled = false;
+    document.getElementById('run-btn').style.opacity = '1';
+    analysisRunning = false;
+  }
+
+  // ── Agent output HTML ─────────────────────────
+  function metricRow(label, value, highlight) {
+    return `<tr style="border-bottom:1px solid var(--qk-border);">
+      <td class="py-2.5 pr-4 text-xs" style="color:var(--qk-muted);">${label}</td>
+      <td class="py-2.5 text-xs font-semibold font-mono text-right" style="color:${highlight||'var(--qk-text)'};">${value}</td>
+    </tr>`;
+  }
+  function agentCard(name, role, color, body) {
+    return `<div class="rounded-xl border overflow-hidden" style="border-color:var(--qk-border);background:var(--qk-surface);">
+      <div class="flex items-center gap-3 px-4 py-3 border-b" style="border-color:var(--qk-border);background:var(--qk-s2);">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold" style="background:${color}20;color:${color};">${name[0]}</div>
+        <div><p class="text-sm font-bold" style="color:var(--qk-text);">${name}</p><p class="text-xs" style="color:var(--qk-muted);">${role}</p></div>
+        <span class="ml-auto text-xs font-semibold px-2 py-0.5 rounded-full" style="background:rgba(16,185,129,0.12);color:#10B981;">Complete</span>
+      </div>
+      <div class="p-4">${body}</div>
+    </div>`;
+  }
+
+  const AGENT_OUTPUTS = {
+    avery: agentCard('Avery','Property Intake & Data Normalization','#8B5CF6',`
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="p-3 rounded-lg" style="background:var(--qk-s2);">
+          <p class="text-xs mb-1" style="color:var(--qk-muted);">Address</p>
+          <p class="text-xs font-semibold" style="color:var(--qk-text);">812 Birchwood Ave<br/>Little Rock, AR 72205</p>
+        </div>
+        <div class="p-3 rounded-lg" style="background:var(--qk-s2);">
+          <p class="text-xs mb-1" style="color:var(--qk-muted);">Property Type</p>
+          <p class="text-xs font-semibold" style="color:var(--qk-text);">Single-Family<br/>3 bed · 2 bath</p>
+        </div>
+        <div class="p-3 rounded-lg" style="background:var(--qk-s2);">
+          <p class="text-xs mb-1" style="color:var(--qk-muted);">Size</p>
+          <p class="text-xs font-semibold font-mono" style="color:var(--qk-text);">1,840 sqft · 0.23 ac</p>
+        </div>
+        <div class="p-3 rounded-lg" style="background:var(--qk-s2);">
+          <p class="text-xs mb-1" style="color:var(--qk-muted);">Year Built</p>
+          <p class="text-xs font-semibold font-mono" style="color:var(--qk-text);">2008</p>
+        </div>
+        <div class="p-3 rounded-lg" style="background:var(--qk-s2);">
+          <p class="text-xs mb-1" style="color:var(--qk-muted);">List Price</p>
+          <p class="text-xs font-semibold font-mono" style="color:var(--qk-accent);">$285,000</p>
+        </div>
+        <div class="p-3 rounded-lg" style="background:var(--qk-s2);">
+          <p class="text-xs mb-1" style="color:var(--qk-muted);">Days on Market</p>
+          <p class="text-xs font-semibold font-mono" style="color:var(--qk-text);">12 days</p>
+        </div>
+      </div>
+      <p class="text-xs leading-relaxed" style="color:var(--qk-muted);">Zoning R-2 Residential. No HOA. Last sale Aug 2019 at $198,000. Data normalized from MLS, county tax records, and Zillow. All fields verified — no data gaps detected.</p>
+    `),
+
+    rex: agentCard('Rex','Rental Market Comps & Demand Analysis','#3B82F6',`
+      <table class="w-full mb-4">
+        ${metricRow('Active comps (72205)','18 listings')}
+        ${metricRow('Median monthly rent','$2,200 / mo','var(--qk-text)')}
+        ${metricRow('Median occupancy','91%','#10B981')}
+        ${metricRow('Demand index','7.4 / 10','#10B981')}
+        ${metricRow('90-day absorption','94%')}
+        ${metricRow('Seasonal peak','Jan – Mar (corp relocation)')}
+        ${metricRow('Your target range','$2,100 – $2,350 / mo','var(--qk-text)')}
+      </table>
+      <p class="text-xs leading-relaxed" style="color:var(--qk-muted);">Little Rock's 72205 submarket shows consistent MTR demand driven by UAMS Medical Center and Dillard's corporate HQ relocations. Supply is constrained — only 18 active comparable listings. Strong absorption indicates pricing power within the target range.</p>
+    `),
+
+    rhea: agentCard('Rhea','Revenue Projection','#EC4899',`
+      <table class="w-full mb-4">
+        <thead><tr style="border-bottom:1px solid var(--qk-border);">
+          <th class="text-left py-2 text-xs font-semibold" style="color:var(--qk-muted);">Strategy</th>
+          <th class="text-right py-2 text-xs font-semibold" style="color:var(--qk-muted);">Annual</th>
+          <th class="text-right py-2 text-xs font-semibold" style="color:var(--qk-muted);">Monthly</th>
+          <th class="text-right py-2 text-xs font-semibold" style="color:var(--qk-muted);">Occ.</th>
+        </tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--qk-border);">
+            <td class="py-2.5 text-xs font-semibold" style="color:#FF5757;">STR</td>
+            <td class="py-2.5 text-xs font-mono text-right" style="color:var(--qk-text);">$48,618</td>
+            <td class="py-2.5 text-xs font-mono text-right" style="color:var(--qk-muted);">$4,052</td>
+            <td class="py-2.5 text-xs font-mono text-right" style="color:var(--qk-muted);">68%</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--qk-border);background:rgba(16,185,129,0.04);">
+            <td class="py-2.5 text-xs font-semibold flex items-center gap-1" style="color:#10B981;">MTR <span class="text-xs px-1.5 rounded" style="background:rgba(16,185,129,0.15);color:#10B981;">Rec</span></td>
+            <td class="py-2.5 text-xs font-mono text-right" style="color:var(--qk-text);">$25,920</td>
+            <td class="py-2.5 text-xs font-mono text-right" style="color:var(--qk-muted);">$2,160</td>
+            <td class="py-2.5 text-xs font-mono text-right" style="color:var(--qk-muted);">91%</td>
+          </tr>
+          <tr>
+            <td class="py-2.5 text-xs font-semibold" style="color:var(--qk-muted);">LTR</td>
+            <td class="py-2.5 text-xs font-mono text-right" style="color:var(--qk-text);">$18,810</td>
+            <td class="py-2.5 text-xs font-mono text-right" style="color:var(--qk-muted);">$1,568</td>
+            <td class="py-2.5 text-xs font-mono text-right" style="color:var(--qk-muted);">95%</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-xs leading-relaxed" style="color:var(--qk-muted);">MTR is recommended for this asset. While STR yields higher gross revenue, MTR's 91% occupancy rate delivers more predictable cash flow with lower operational overhead. MTR breakeven occupancy is 62% — well below market average.</p>
+    `),
+
+    sloane: agentCard('Sloane','Expense Modeling & NOI Calculation','#F59E0B',`
+      <table class="w-full mb-4">
+        ${metricRow('Property taxes',  '$3,420 / yr')}
+        ${metricRow('Insurance',       '$1,680 / yr')}
+        ${metricRow('Maintenance (est)','$2,850 / yr')}
+        ${metricRow('MTR turnover (3×)','$2,040 / yr')}
+        ${metricRow('Property mgmt (10%)','$2,592 / yr')}
+        ${metricRow('Utilities','$0 (tenant-paid)')}
+        <tr style="border-top:2px solid var(--qk-border);">
+          <td class="pt-3 text-xs font-bold" style="color:var(--qk-text);">Total Expenses</td>
+          <td class="pt-3 text-xs font-bold font-mono text-right" style="color:var(--qk-danger);">$12,582 / yr</td>
+        </tr>
+        <tr>
+          <td class="pt-1 text-xs font-bold" style="color:var(--qk-text);">Net Operating Income</td>
+          <td class="pt-1 text-xs font-bold font-mono text-right" style="color:var(--qk-success);">$13,338 / yr</td>
+        </tr>
+      </table>
+      <p class="text-xs leading-relaxed" style="color:var(--qk-muted);">Expense ratio of 48.5% is in line with comparable MTR properties in the submarket. Maintenance estimate based on 1% of purchase price annually. Property management assumed at 10% of gross revenue — adjust in assumptions if self-managing.</p>
+    `),
+
+    uri: agentCard('Uri','Financing & Debt Service Analysis','#06B6D4',`
+      <table class="w-full mb-4">
+        ${metricRow('Purchase price',   '$285,000')}
+        ${metricRow('Down payment (20%)','$57,000')}
+        ${metricRow('Loan amount',       '$228,000')}
+        ${metricRow('Rate / Term',       '6.75% / 30yr fixed')}
+        ${metricRow('Monthly P&I',       '$1,478 / mo')}
+        ${metricRow('Annual debt svc',   '$17,736 / yr')}
+        <tr style="border-top:2px solid var(--qk-border);">
+          <td class="pt-3 text-xs font-bold" style="color:var(--qk-text);">Annual Cash Flow</td>
+          <td class="pt-3 text-xs font-bold font-mono text-right" style="color:var(--qk-success);">–$4,398 / yr</td>
+        </tr>
+        ${metricRow('Cash-on-Cash Return','–7.7%')}
+        ${metricRow('DSCR',               '0.75','#F59E0B')}
+        ${metricRow('Cap Rate',           '4.68%','var(--qk-text)')}
+      </table>
+      <div class="p-3 rounded-lg" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);">
+        <p class="text-xs font-semibold mb-1" style="color:var(--qk-warning);">⚠ Financing note</p>
+        <p class="text-xs" style="color:var(--qk-muted);">At current rates, MTR cash flow is negative on a leveraged basis. STR strategy (NOI ~$22,959) would achieve DSCR 1.29 and CoC 9.2%. Consider STR or a larger down payment to improve debt coverage.</p>
+      </div>
+    `),
+
+    pax: agentCard('Pax','Final Risk Score & Recommendation','#10B981',`
+      <!-- Score gauge -->
+      <div class="flex flex-col sm:flex-row items-center gap-6 mb-5">
+        <div class="relative flex-shrink-0">
+          <svg viewBox="0 0 120 120" class="w-28 h-28">
+            <circle cx="60" cy="60" r="54" stroke="var(--qk-border)" stroke-width="8" fill="none"/>
+            <circle id="gauge-ring" cx="60" cy="60" r="54"
+                    stroke="#FF5757" stroke-width="8" fill="none"
+                    stroke-linecap="round"
+                    stroke-dasharray="339.29" stroke-dashoffset="339.29"
+                    transform="rotate(-90 60 60)"
+                    class="gauge-ring"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span id="gauge-score" class="text-3xl font-bold font-mono" style="color:var(--qk-text);">—</span>
+            <span class="text-xs" style="color:var(--qk-muted);">/ 100</span>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-2xl font-bold" style="color:var(--qk-text);">QuestKey Score</span>
+            <span class="px-3 py-1 rounded-full text-sm font-bold" style="background:rgba(16,185,129,0.15);color:#10B981;">BUY</span>
+          </div>
+          <p class="text-sm" style="color:var(--qk-muted);">812 Birchwood Ave · Little Rock AR · STR strategy</p>
+          <div class="flex gap-2 mt-3 flex-wrap">
+            <span class="px-2 py-1 rounded-lg text-xs font-medium" style="background:rgba(16,185,129,0.1);color:#10B981;">Strong Market</span>
+            <span class="px-2 py-1 rounded-lg text-xs font-medium" style="background:rgba(16,185,129,0.1);color:#10B981;">Good DSCR (STR)</span>
+            <span class="px-2 py-1 rounded-lg text-xs font-medium" style="background:rgba(245,158,11,0.1);color:#F59E0B;">MTR Cash-Flow Risk</span>
+          </div>
+        </div>
+      </div>
+      <!-- Memo -->
+      <div class="space-y-3 text-xs leading-relaxed pt-4 border-t" style="border-color:var(--qk-border);color:var(--qk-muted);">
+        <p><span class="font-semibold" style="color:var(--qk-text);">Summary:</span> 812 Birchwood Ave scores 88/100 on the QuestKey underwriting model. The asset sits in a high-demand submarket driven by medical and corporate relocations, with only 18 active competing listings. STR strategy delivers $48,618 gross annual revenue at 68% occupancy with a breakeven threshold of 52%.</p>
+        <p><span class="font-semibold" style="color:var(--qk-text);">Key Risks:</span> MTR financing is cash-flow negative at current rates (DSCR 0.75). STR strategy resolves this but introduces regulatory and occupancy risk. No active STR permit restrictions identified for 72205 as of April 2026 — verify with city before closing. Seasonal variance of ±18% revenue expected Q1 vs Q3.</p>
+        <p><span class="font-semibold" style="color:var(--qk-text);">Recommendation:</span> Proceed with STR strategy. If STR is not viable post-due-diligence, fallback to LTR at $1,650/mo (stable but cash-flow negative at current leverage). Consider 25% down payment to bring MTR DSCR above 1.0. Strong buy at or below $275,000 ask price.</p>
+      </div>
+    `)
+  };
+
+  // ── Settings tabs ─────────────────────────────
+  const SETTINGS_TABS = ['account', 'subscription', 'notifications', 'integrations'];
+  function showSettingsTab(id) {
+    SETTINGS_TABS.forEach(t => {
+      const content = document.getElementById('stab-content-' + t);
+      const btn     = document.getElementById('stab-' + t);
+      if (content) content.classList.toggle('hidden', t !== id);
+      if (btn) {
+        btn.style.borderColor = t === id ? 'var(--qk-accent)' : 'transparent';
+        btn.style.color       = t === id ? 'var(--qk-accent)' : 'var(--qk-muted)';
+      }
+    });
+  }
+
+  function toggleSwitch(el) {
+    const on = el.dataset.on === 'true';
+    el.dataset.on = String(!on);
+    el.style.background = !on ? 'var(--qk-accent)' : 'var(--qk-border)';
+    el.querySelector('.toggle-thumb').style.transform = !on ? 'translateX(20px)' : 'translateX(0)';
+  }
+
+  // ── App view switching ─────────────────────────
+  const APP_VIEWS = ['dashboard', 'analysis', 'settings'];
+
+  function showAppView(id) {
+    APP_VIEWS.forEach(v => {
+      document.getElementById('view-' + v).classList.toggle('hidden', v !== id);
+      // sidebar nav
+      const nl = document.getElementById('nav-' + v);
+      if (nl) nl.classList.toggle('active', v === id);
+      // mobile nav
+      const mn = document.getElementById('mob-' + v);
+      if (mn) mn.style.color = v === id ? 'var(--qk-accent)' : 'var(--qk-muted)';
+    });
+  }
+</script>
+
+</body>
+</html>
